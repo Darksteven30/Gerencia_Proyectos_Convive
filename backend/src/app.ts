@@ -18,6 +18,7 @@ import { pqrsRouter } from './modules/pqrs'; // @RF-04
 import { noticiasRouter, notificacionesRouter } from './modules/noticias'; // @RF-05
 import { visitasRouter } from './modules/visitas'; // @RF-06
 import { parqueaderosRouter } from './modules/parqueaderos'; // @RF-07
+import { reportesRouter } from './modules/reportes'; // @RF-08
 import { adminRouter } from './modules/admin'; // @RF-09
 import { errorHandler, notFound } from './utils/errors';
 
@@ -63,6 +64,7 @@ export function crearApp() {
   app.use('/api/notificaciones', notificacionesRouter); // @RF-05
   app.use('/api/visitas', visitasRouter); // @RF-06
   app.use('/api/parqueaderos', parqueaderosRouter); // @RF-07
+  app.use('/api/reportes', reportesRouter); // @RF-08
   app.use('/api/admin', adminRouter); // @RF-09
 
   app.use((_req, _res, next) => next(notFound('Ruta no encontrada')));
