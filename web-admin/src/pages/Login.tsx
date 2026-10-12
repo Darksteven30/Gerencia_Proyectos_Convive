@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ApiError } from '../api/client';
 import { ROLES_PANEL, useAuth } from '../auth/AuthContext';
+import { Logo } from '../components/Marca';
 import { Alerta, BotonCarga, Campo } from '../components/ui';
 import { menuParaRoles, rutaInicial } from '../rutas';
 
@@ -49,30 +50,27 @@ export function Login() {
   return (
     <div className="login">
       <div className="login-caja">
-        <div className="marca">
-          <span className="marca-logo" aria-hidden="true">
-            ⌂
-          </span>
-          <div>
-            <strong>Convive</strong>
-            <small>Panel administrativo del conjunto</small>
-          </div>
+        <div className="login-marca">
+          <Logo tamano={88} etiqueta="Logo de Convive" />
+          <strong>Convive</strong>
+          <span>Panel administrativo del conjunto</span>
         </div>
-        <h1 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Iniciar sesión</h1>
+        <h1 className="login-titulo">Iniciar sesión</h1>
+        <p className="login-subtitulo">Use el correo y la contraseña de su cuenta en el conjunto residencial</p>
         {aviso && <Alerta tipo="aviso">{aviso}</Alerta>}
         {error && <Alerta tipo={error.tipo}>{error.texto}</Alerta>}
         <form onSubmit={enviar}>
           <Campo etiqueta="Correo electrónico">
-            <input type="email" autoComplete="username" required value={correo} onChange={(e) => setCorreo(e.target.value)} placeholder="usuario@conjunto.co" />
+            <input type="email" autoComplete="username" required value={correo} onChange={(e) => setCorreo(e.target.value)} placeholder="correo@dominio.com" />
           </Campo>
           <Campo etiqueta="Contraseña">
-            <input type="password" autoComplete="current-password" required value={contrasena} onChange={(e) => setContrasena(e.target.value)} />
+            <input type="password" autoComplete="current-password" required value={contrasena} onChange={(e) => setContrasena(e.target.value)} placeholder="Su contraseña" />
           </Campo>
-          <BotonCarga type="submit" cargando={enviando} className="btn btn-prim btn-bloque">
+          <BotonCarga type="submit" cargando={enviando} className="btn btn-negro btn-grande btn-bloque">
             Ingresar
           </BotonCarga>
         </form>
-        <p className="texto-suave" style={{ fontSize: '0.8rem', marginTop: '1.2rem' }}>
+        <p className="texto-suave login-nota">
           Acceso para administración, junta directiva y portería. Tras cinco intentos fallidos la cuenta se bloquea durante 15 minutos.
         </p>
       </div>
