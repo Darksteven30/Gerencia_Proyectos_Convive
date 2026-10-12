@@ -22,6 +22,7 @@ const ACCESOS: Acceso[] = [
   { texto: 'Pagar cuotas', icono: 'card-outline', destino: 'Pagos' }, // @RF-02
   { texto: 'Reservar zona', icono: 'calendar-outline', destino: 'Reservas' }, // @RF-03
   { texto: 'Nueva PQRS', icono: 'chatbubble-ellipses-outline', destino: 'NuevaPqrs' }, // @RF-04
+  { texto: 'Noticias', icono: 'newspaper-outline', destino: 'Noticias' }, // @RF-05
   { texto: 'Mi perfil', icono: 'person-circle-outline', destino: 'Perfil' },
 ];
 
@@ -41,6 +42,7 @@ export function InicioPantalla() {
     let cuenta: EstadoCuentaUnidad[] = [];
     let ultimas: Noticia[] = [];
     cuenta = await pagos.estadoCuenta(); // @RF-02
+    ultimas = (await noticias.listar()).slice(0, 3); // @RF-05
     return { cuenta, noticias: ultimas };
   });
 
@@ -99,6 +101,31 @@ export function InicioPantalla() {
                 </View>
               </Seccion>
 
+              {/* #region @RF-05 */}
+              <Seccion
+                titulo="Últimas noticias"
+                accion={<Boton titulo="Ver todas" variante="texto" alPresionar={() => ir('Noticias')} />}
+              >
+                {ultimas.length === 0 ? (
+                  <Tarjeta>
+                    <TextoSecundario>No hay noticias publicadas por ahora.</TextoSecundario>
+                  </Tarjeta>
+                ) : (
+                  ultimas.map((n) => (
+                    <Tarjeta key={n.id_noticia} alPresionar={() => navegacion.navigate('DetalleNoticia', { idNoticia: n.id_noticia })}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: espacio.s }}>
+                        <Text style={estilos.tituloNoticia} numberOfLines={2}>
+                          {n.titulo}
+                        </Text>
+                        {n.tipo === 'URGENTE' && <Insignia texto="Urgente" tono="peligro" />}
+                      </View>
+                      <TextoSecundario lineas={2}>{n.contenido}</TextoSecundario>
+                      <TextoSecundario estilo={{ fontSize: 12, marginTop: 6 }}>{formatoFechaHora(n.fecha_publicacion)}</TextoSecundario>
+                    </Tarjeta>
+                  ))
+                )}
+              </Seccion>
+              {/* #endregion @RF-05 */}
             </>
           );
         }}

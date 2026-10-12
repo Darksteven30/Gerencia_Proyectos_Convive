@@ -11,10 +11,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { EstadoCarga } from '../componentes/ui';
 import { useAuth } from '../contexto/AuthContext';
+import { useNotificaciones } from '../contexto/NotificacionesContext'; // @RF-05
 import { ActivarPantalla } from '../pantallas/auth/ActivarPantalla';
 import { IngresoPantalla } from '../pantallas/auth/IngresoPantalla';
 import { RecuperarPantalla } from '../pantallas/auth/RecuperarPantalla';
 import { InicioPantalla } from '../pantallas/InicioPantalla';
+import { NotificacionesPantalla } from '../pantallas/NotificacionesPantalla'; // @RF-05
+import { DetalleNoticiaPantalla } from '../pantallas/noticias/DetalleNoticiaPantalla'; // @RF-05
+import { NoticiasPantalla } from '../pantallas/noticias/NoticiasPantalla'; // @RF-05
 import { HistorialPagosPantalla } from '../pantallas/pagos/HistorialPagosPantalla'; // @RF-02
 import { PagosPantalla } from '../pantallas/pagos/PagosPantalla'; // @RF-02
 import { ResultadoPagoPantalla } from '../pantallas/pagos/ResultadoPagoPantalla'; // @RF-02
@@ -64,6 +68,7 @@ function BotonPerfil() {
 }
 
 function PestanasPrincipales() {
+  const { noLeidas } = useNotificaciones(); // @RF-05
   return (
     <Pestanas.Navigator
       screenOptions={({ route }) => ({
@@ -81,6 +86,18 @@ function PestanasPrincipales() {
       <Pestanas.Screen name="Pagos" component={PagosPantalla} options={{ title: 'Estado de cuenta', tabBarLabel: 'Pagos' }} /> {/* @RF-02 */}
       <Pestanas.Screen name="Reservas" component={ZonasPantalla} options={{ title: 'Zonas comunes', tabBarLabel: 'Reservas' }} /> {/* @RF-03 */}
       <Pestanas.Screen name="Pqrs" component={PqrsListaPantalla} options={{ title: 'Mis PQRS', tabBarLabel: 'PQRS' }} /> {/* @RF-04 */}
+      {/* #region @RF-05 */}
+      <Pestanas.Screen
+        name="Avisos"
+        component={NotificacionesPantalla}
+        options={{
+          title: 'Notificaciones',
+          tabBarLabel: 'Avisos',
+          tabBarBadge: noLeidas > 0 ? (noLeidas > 99 ? '99+' : noLeidas) : undefined,
+          tabBarBadgeStyle: { backgroundColor: colores.peligro },
+        }}
+      />
+      {/* #endregion @RF-05 */}
     </Pestanas.Navigator>
   );
 }
@@ -95,6 +112,8 @@ function PilaPrincipal() {
       <PilaApp.Screen name="MisReservas" component={MisReservasPantalla} options={{ title: 'Mis reservas' }} /> {/* @RF-03 */}
       <PilaApp.Screen name="NuevaPqrs" component={NuevaPqrsPantalla} options={{ title: 'Nueva PQRS' }} /> {/* @RF-04 */}
       <PilaApp.Screen name="DetallePqrs" component={DetallePqrsPantalla} options={{ title: 'Detalle de la PQRS' }} /> {/* @RF-04 */}
+      <PilaApp.Screen name="Noticias" component={NoticiasPantalla} options={{ title: 'Noticias' }} /> {/* @RF-05 */}
+      <PilaApp.Screen name="DetalleNoticia" component={DetalleNoticiaPantalla} options={{ title: 'Noticia' }} /> {/* @RF-05 */}
       <PilaApp.Screen name="Perfil" component={PerfilPantalla} options={{ title: 'Mi perfil' }} />
     </PilaApp.Navigator>
   );
