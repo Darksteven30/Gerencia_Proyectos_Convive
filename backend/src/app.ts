@@ -12,6 +12,7 @@ import { prisma } from './config/prisma';
 import { infoApi } from './modules/info';
 import { authRouter } from './modules/auth'; // @RF-01
 import { usuariosRouter } from './modules/usuarios'; // @RF-01
+import { adminRouter } from './modules/admin'; // @RF-09
 import { errorHandler, notFound } from './utils/errors';
 
 // Los valores monetarios (DECIMAL) se envían como número en las respuestas JSON.
@@ -49,6 +50,7 @@ export function crearApp() {
 
   app.use('/api/auth', authRouter); // @RF-01
   app.use('/api/admin', usuariosRouter); // @RF-01
+  app.use('/api/admin', adminRouter); // @RF-09
 
   app.use((_req, _res, next) => next(notFound('Ruta no encontrada')));
   app.use(errorHandler);
