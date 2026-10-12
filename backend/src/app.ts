@@ -15,6 +15,7 @@ import { usuariosRouter } from './modules/usuarios'; // @RF-01
 import { finanzasRouter } from './modules/finanzas'; // @RF-02
 import { reservasRouter } from './modules/reservas'; // @RF-03
 import { pqrsRouter } from './modules/pqrs'; // @RF-04
+import { noticiasRouter, notificacionesRouter } from './modules/noticias'; // @RF-05
 import { adminRouter } from './modules/admin'; // @RF-09
 import { errorHandler, notFound } from './utils/errors';
 
@@ -56,6 +57,8 @@ export function crearApp() {
   app.use('/api', finanzasRouter); // @RF-02 /api/cuotas, /api/estado-cuenta, /api/pagos
   app.use('/api', reservasRouter); // @RF-03 /api/zonas, /api/reservas
   app.use('/api/pqrs', pqrsRouter); // @RF-04
+  app.use('/api/noticias', noticiasRouter); // @RF-05
+  app.use('/api/notificaciones', notificacionesRouter); // @RF-05
   app.use('/api/admin', adminRouter); // @RF-09
 
   app.use((_req, _res, next) => next(notFound('Ruta no encontrada')));
