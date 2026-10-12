@@ -1,23 +1,26 @@
 /**
  * Logo de Convive (círculo turquesa con degradado suave y una casa blanca) y avatar con iniciales.
  */
-import React from 'react';
+import React, { useId } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 import type { Perfil } from '../api/tipos';
 import { colores, TACTIL_MIN } from '../tema';
 
 export function Logo({ tamano = 72 }: { tamano?: number }) {
+  // Identificador único por instancia: en web, si dos logos comparten el id del degradado y uno está en
+  // una pantalla oculta de la pila, el navegador toma ese degradado y el círculo no se dibuja.
+  const idDegradado = `degradadoLogo${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   return (
     <View accessibilityRole="image" accessibilityLabel="Logo de Convive">
       <Svg width={tamano} height={tamano} viewBox="0 0 100 100">
         <Defs>
-          <LinearGradient id="degradadoLogo" x1="0" y1="0" x2="1" y2="1">
+          <LinearGradient id={idDegradado} x1="0" y1="0" x2="1" y2="1">
             <Stop offset="0" stopColor={colores.turquesaClaro} />
             <Stop offset="1" stopColor={colores.turquesaOscuro} />
           </LinearGradient>
         </Defs>
-        <Circle cx="50" cy="50" r="50" fill="url(#degradadoLogo)" />
+        <Circle cx="50" cy="50" r="50" fill={`url(#${idDegradado})`} />
         {/* Casa: techo a dos aguas, cuerpo y puerta */}
         <Path d="M50 24 L76 46 L70 46 L70 74 L30 74 L30 46 L24 46 Z" fill={colores.blanco} />
         <Path d="M44 74 L44 58 Q44 55 47 55 L53 55 Q56 55 56 58 L56 74 Z" fill={colores.turquesa} />
