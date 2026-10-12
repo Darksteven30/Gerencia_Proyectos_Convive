@@ -19,6 +19,7 @@ import { PqrsPagina } from './pages/Pqrs'; // @RF-04
 import { Noticias } from './pages/Noticias'; // @RF-05
 import { Usuarios } from './pages/Usuarios'; // @RF-01
 import { Unidades } from './pages/Unidades'; // @RF-09
+import { Parqueaderos } from './pages/Parqueaderos'; // @RF-07
 import { VisitasDia } from './pages/VisitasDia'; // @RF-06
 import { Auditoria } from './pages/Auditoria'; // @RF-09
 import { ConjuntoPagina } from './pages/Conjunto'; // @RF-09
@@ -35,6 +36,7 @@ const PAGINAS: Record<string, ReactNode> = {
   '/noticias': <Noticias />, // @RF-05
   '/usuarios': <Usuarios />, // @RF-01
   '/unidades': <Unidades />, // @RF-09
+  '/parqueaderos': <Parqueaderos />, // @RF-07
   // #region @RF-06
   '/acceso': (
     <Suspense fallback={<Cargando />}>
