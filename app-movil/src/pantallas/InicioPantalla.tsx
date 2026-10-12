@@ -20,6 +20,7 @@ type Acceso = {
 
 const ACCESOS: Acceso[] = [
   { texto: 'Pagar cuotas', icono: 'card-outline', destino: 'Pagos' }, // @RF-02
+  { texto: 'Reservar zona', icono: 'calendar-outline', destino: 'Reservas' }, // @RF-03
   { texto: 'Mi perfil', icono: 'person-circle-outline', destino: 'Perfil' },
 ];
 
