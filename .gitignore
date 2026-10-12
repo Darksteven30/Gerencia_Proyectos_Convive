@@ -1,0 +1,34 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (nunca se versionan, ver Tabla 18 de la Entrega 3)
+.env
+.env.local
+.env.*.local
+
+# Compilados
+dist/
+*.tsbuildinfo
+build/
+web-build/
+
+# Base de datos local embebida y archivos subidos
+backend/.pgdata/
+backend/uploads/
+
+# Expo
+app-movil/.expo/
+app-movil/android/
+app-movil/ios/
+*.apk
+*.aab
+
+# Pruebas y cobertura
+coverage/
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+*.log
+.vscode/*
+!.vscode/extensions.json
