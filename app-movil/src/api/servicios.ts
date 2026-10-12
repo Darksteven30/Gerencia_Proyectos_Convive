@@ -20,6 +20,8 @@ import type {
   RespuestaOk,
   RespuestaRecuperar,
   RespuestaSesion,
+  PeriodoResumen,
+  ResumenGeneral,
   Visita,
   Zona,
 } from './tipos';
@@ -107,4 +109,9 @@ export const visitas = {
   mias: () => solicitud<Visita[]>('/api/visitas/mias'),
   crear: (datos: NuevaVisita) => solicitud<Visita>('/api/visitas', { metodo: 'POST', cuerpo: datos }),
   cancelar: (id: number) => solicitud<RespuestaOk>(`/api/visitas/${id}/cancelar`, { metodo: 'POST', cuerpo: {} }),
+};
+
+// --- Resumen general (solo JUNTA o ADMINISTRADOR) ---
+export const admin = {
+  resumen: (periodo: PeriodoResumen) => solicitud<ResumenGeneral>(`/api/admin/resumen?periodo=${periodo}`),
 };

@@ -30,7 +30,7 @@ export function NoticiasPantalla() {
                   <Insignia texto={TEXTO_NOTICIA[n.tipo] ?? n.tipo} tono={TONO_NOTICIA[n.tipo] ?? 'info'} />
                   {n.torre_destino && <Insignia texto={n.torre_destino} tono="neutro" />}
                 </View>
-                <Text style={{ fontSize: 17, fontWeight: '700', color: colores.texto }}>{n.titulo}</Text>
+                <Text style={{ fontSize: 16, fontWeight: '700', color: colores.texto }}>{n.titulo}</Text>
                 <TextoSecundario lineas={3} estilo={{ marginTop: 4 }}>
                   {n.contenido}
                 </TextoSecundario>

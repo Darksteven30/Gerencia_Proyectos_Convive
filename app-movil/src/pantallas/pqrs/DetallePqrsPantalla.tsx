@@ -114,8 +114,8 @@ export function DetallePqrsPantalla({ route }: PropsApp<'DetallePqrs'>) {
                   {p.seguimientos.map((s, i) => (
                     <View key={i} style={{ flexDirection: 'row', marginBottom: i < p.seguimientos.length - 1 ? espacio.m : 0 }}>
                       <View style={{ alignItems: 'center', marginRight: espacio.m }}>
-                        <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: colores.primario, marginTop: 4 }} />
-                        {i < p.seguimientos.length - 1 && <View style={{ width: 2, flex: 1, backgroundColor: colores.primarioClaro, marginTop: 2 }} />}
+                        <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: colores.turquesa, marginTop: 4 }} />
+                        {i < p.seguimientos.length - 1 && <View style={{ width: 2, flex: 1, backgroundColor: colores.borde, marginTop: 2 }} />}
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={{ fontWeight: '700', color: colores.texto }}>{etiquetaEstado(s.estado_nuevo)}</Text>

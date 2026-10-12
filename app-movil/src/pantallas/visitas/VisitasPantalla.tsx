@@ -5,7 +5,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { visitas } from '../../api/servicios';
 import { InsigniaEstado } from '../../componentes/InsigniaEstado';
-import { Boton, Contenido, EstadoVacio, Icono, Pantalla, Tarjeta, TextoSecundario } from '../../componentes/ui';
+import { Boton, Contenido, EstadoVacio, Icono, Pastilla, Pantalla, Tarjeta, TextoSecundario } from '../../componentes/ui';
 import { useCarga } from '../../hooks/useCarga';
 import { useNavegacion } from '../../navegacion/tipos';
 import { colores, espacio } from '../../tema';
@@ -17,12 +17,10 @@ export function VisitasPantalla() {
 
   return (
     <Pantalla refrescando={carga.refrescando} alRefrescar={carga.refrescar}>
-      <Boton
-        titulo="Pre-registrar visitante"
-        icono="person-add-outline"
-        alPresionar={() => navegacion.navigate('NuevaVisita')}
-        estilo={{ marginBottom: espacio.l }}
-      />
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: espacio.m }}>
+        <Pastilla texto="Mis visitas" />
+        <Boton titulo="Registrar visitante" compacto icono="person-add-outline" alPresionar={() => navegacion.navigate('NuevaVisita')} />
+      </View>
       <Contenido cargando={carga.cargando} error={carga.error} datos={carga.datos} alReintentar={carga.recargar}>
         {(lista) =>
           lista.length === 0 ? (
@@ -42,8 +40,8 @@ export function VisitasPantalla() {
                 {v.motivo ? <TextoSecundario>{v.motivo}</TextoSecundario> : null}
                 {v.estado === 'PREREGISTRADA' && (
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: espacio.s }}>
-                    <Icono nombre="qr-code-outline" tamano={18} />
-                    <Text style={{ color: colores.primario, fontWeight: '700', marginLeft: 6 }}>Ver código QR y compartir</Text>
+                    <Icono nombre="qr-code-outline" tamano={18} color={colores.enlace} />
+                    <Text style={{ color: colores.enlace, fontWeight: '700', marginLeft: 6 }}>Ver código QR y compartir</Text>
                   </View>
                 )}
               </Tarjeta>

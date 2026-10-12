@@ -291,3 +291,20 @@ export interface NuevaVisita {
   hora_hasta: string;
   motivo?: string;
 }
+
+// --- Resumen general (junta y administración) ---
+export type PeriodoResumen = 'mes' | 'trimestre' | 'semestre' | 'anio';
+
+export interface ResumenGeneral {
+  periodo: PeriodoResumen;
+  /** Mes inicial y final del periodo (AAAA-MM). */
+  desde: string;
+  hasta: string;
+  recaudo_periodo: number;
+  facturado_periodo: number;
+  cartera_pendiente: number;
+  movimientos: { mes: string; recaudado: number; pendiente: number }[];
+  recaudo_por_concepto: { nombre: string; valor: number }[];
+  pqrs_por_categoria: { nombre: string; cantidad: number }[];
+  reservas_por_zona: { nombre: string; cantidad: number }[];
+}
