@@ -1,0 +1,540 @@
+// Modelo de datos del prototipo Convive.
+// Implementa las 27 entidades del modelo entidad-relación y del diccionario de datos
+// de la Entrega 2 (secciones 5 y 6). Los nombres de tablas y campos conservan la
+// convención snake_case del diccionario. Los identificadores usan INTEGER autoincremental
+// (suficiente para el volumen de un conjunto de 20 a 500 unidades, RNF-07).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Grupo 1: núcleo del conjunto, usuarios y seguridad
+// ---------------------------------------------------------------------------
+
+model Conjunto {
+  id_conjunto      Int      @id @default(autoincrement())
+  nombre           String   @db.VarChar(120)
+  nit              String   @unique @db.VarChar(15)
+  direccion        String   @db.VarChar(200)
+  ciudad           String   @db.VarChar(80)
+  departamento     String   @db.VarChar(80)
+  telefono         String?  @db.VarChar(20)
+  correo_contacto  String?  @db.VarChar(120)
+  numero_unidades  Int
+  estado           String   @default("ACTIVO") @db.VarChar(15)
+  fecha_registro   DateTime @default(now())
+
+  torres        Torre[]
+  unidades      UnidadResidencial[]
+  roles         UsuarioRol[]
+  reportes      Reporte[]
+  zonas         ZonaComun[]
+  noticias      Noticia[]
+  parqueaderos  Parqueadero[]
+
+  @@map("conjunto")
+}
+
+model Torre {
+  id_torre     Int     @id @default(autoincrement())
+  id_conjunto  Int
+  nombre       String  @db.VarChar(50)
+  numero_pisos Int?    @db.SmallInt
+
+  conjunto Conjunto            @relation(fields: [id_conjunto], references: [id_conjunto])
+  unidades UnidadResidencial[]
+  noticias Noticia[]
+
+  @@unique([id_conjunto, nombre])
+  @@map("torre")
+}
+
+model UnidadResidencial {
+  id_unidad   Int      @id @default(autoincrement())
+  id_conjunto Int
+  id_torre    Int?
+  numero      String   @db.VarChar(20)
+  tipo        String   @db.VarChar(15) // APARTAMENTO, CASA o LOCAL
+  piso        Int?     @db.SmallInt
+  area_m2     Decimal? @db.Decimal(8, 2)
+  coeficiente Decimal  @db.Decimal(7, 6)
+  estado      String   @default("OCUPADA") @db.VarChar(15) // OCUPADA o DESOCUPADA
+
+  conjunto      Conjunto                @relation(fields: [id_conjunto], references: [id_conjunto])
+  torre         Torre?                  @relation(fields: [id_torre], references: [id_torre])
+  ocupaciones   OcupacionUnidad[]
+  cuotas        CuotaAdministracion[]
+  pagos         Pago[]
+  reservas      Reserva[]
+  pqrs          Pqrs[]
+  visitas       Visita[]
+  parqueaderos  Parqueadero[]
+  asignaciones  AsignacionParqueadero[]
+
+  @@unique([id_conjunto, id_torre, numero])
+  @@map("unidad_residencial")
+}
+
+model Usuario {
+  id_usuario               Int       @id @default(autoincrement())
+  tipo_documento           String    @db.Char(2)
+  numero_documento         String    @db.VarChar(20)
+  nombres                  String    @db.VarChar(80)
+  apellidos                String    @db.VarChar(80)
+  correo                   String    @unique @db.VarChar(120)
+  telefono                 String?   @db.VarChar(20)
+  hash_contrasena          String?   @db.VarChar(255)
+  codigo_invitacion        String?   @unique @db.VarChar(64) // CU-05 Activar cuenta por invitación
+  estado                   String    @default("PENDIENTE") @db.VarChar(15) // PENDIENTE, ACTIVO, INACTIVO o BLOQUEADO
+  intentos_fallidos        Int       @default(0) @db.SmallInt
+  bloqueado_hasta          DateTime?
+  acepta_tratamiento_datos Boolean   @default(false)
+  fecha_aceptacion_datos   DateTime?
+  ultimo_acceso            DateTime?
+  fecha_creacion           DateTime  @default(now())
+
+  roles                UsuarioRol[]
+  ocupaciones          OcupacionUnidad[]
+  sesiones             Sesion[]
+  dispositivos         DispositivoNotificacion[]
+  auditoria            AuditoriaLog[]
+  pagos                Pago[]                  @relation("PagoUsuario")
+  pagos_registrados    Pago[]                  @relation("PagoRegistradoPor")
+  reportes             Reporte[]
+  bloqueos_creados     BloqueoZona[]
+  reservas             Reserva[]
+  pqrs                 Pqrs[]                  @relation("PqrsSolicitante")
+  pqrs_asignadas       Pqrs[]                  @relation("PqrsResponsable")
+  seguimientos         PqrsSeguimiento[]
+  noticias             Noticia[]
+  notificaciones       Notificacion[]
+  visitas_anfitrion    Visita[]                @relation("VisitaAnfitrion")
+  visitas_validadas    Visita[]                @relation("VisitaVigilante")
+  asignaciones_parq    AsignacionParqueadero[]
+
+  @@unique([tipo_documento, numero_documento])
+  @@map("usuario")
+}
+
+model Rol {
+  id_rol      Int     @id @db.SmallInt
+  nombre      String  @unique @db.VarChar(30) // ADMINISTRADOR, JUNTA, PROPIETARIO, RESIDENTE o PORTERIA
+  descripcion String? @db.VarChar(200)
+
+  usuarios UsuarioRol[]
+
+  @@map("rol")
+}
+
+model UsuarioRol {
+  id_usuario_rol   Int      @id @default(autoincrement())
+  id_usuario       Int
+  id_rol           Int      @db.SmallInt
+  id_conjunto      Int
+  fecha_asignacion DateTime @default(now())
+  activo           Boolean  @default(true)
+
+  usuario  Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+  rol      Rol      @relation(fields: [id_rol], references: [id_rol])
+  conjunto Conjunto @relation(fields: [id_conjunto], references: [id_conjunto])
+
+  @@unique([id_usuario, id_rol, id_conjunto])
+  @@map("usuario_rol")
+}
+
+model OcupacionUnidad {
+  id_ocupacion        Int       @id @default(autoincrement())
+  id_unidad           Int
+  id_usuario          Int
+  tipo_relacion       String    @db.VarChar(15) // PROPIETARIO, ARRENDATARIO o RESIDENTE
+  es_responsable_pago Boolean   @default(false)
+  fecha_inicio        DateTime  @db.Date
+  fecha_fin           DateTime? @db.Date
+
+  unidad  UnidadResidencial @relation(fields: [id_unidad], references: [id_unidad])
+  usuario Usuario           @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@map("ocupacion_unidad")
+}
+
+model Sesion {
+  id_sesion           Int       @id @default(autoincrement())
+  id_usuario          Int
+  hash_token_refresco String    @db.VarChar(255)
+  dispositivo         String?   @db.VarChar(120)
+  plataforma          String    @db.VarChar(10) // ANDROID, IOS o WEB
+  direccion_ip        String?   @db.VarChar(45)
+  fecha_inicio        DateTime  @default(now())
+  fecha_expiracion    DateTime
+  fecha_cierre        DateTime?
+  activa              Boolean   @default(true)
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@index([hash_token_refresco])
+  @@map("sesion")
+}
+
+model DispositivoNotificacion {
+  id_dispositivo Int      @id @default(autoincrement())
+  id_usuario     Int
+  token_push     String   @unique @db.VarChar(255)
+  plataforma     String   @db.VarChar(10) // ANDROID o IOS
+  activo         Boolean  @default(true)
+  fecha_registro DateTime @default(now())
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@map("dispositivo_notificacion")
+}
+
+model AuditoriaLog {
+  id_log       Int      @id @default(autoincrement())
+  id_usuario   Int?
+  accion       String   @db.VarChar(50)
+  entidad      String   @db.VarChar(50)
+  id_entidad   Int?
+  detalle      String?
+  direccion_ip String?  @db.VarChar(45)
+  fecha_evento DateTime @default(now())
+
+  usuario Usuario? @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@index([fecha_evento])
+  @@map("auditoria_log")
+}
+
+// ---------------------------------------------------------------------------
+// Grupo 2: pagos y finanzas
+// ---------------------------------------------------------------------------
+
+model CuotaAdministracion {
+  id_cuota          Int      @id @default(autoincrement())
+  id_unidad         Int
+  periodo           String   @db.Char(7) // AAAA-MM
+  concepto          String   @db.VarChar(20) // ORDINARIA, EXTRAORDINARIA, MULTA o INTERES_MORA
+  valor             Decimal  @db.Decimal(12, 2)
+  saldo             Decimal  @db.Decimal(12, 2)
+  fecha_vencimiento DateTime @db.Date
+  estado            String   @default("PENDIENTE") @db.VarChar(15) // PENDIENTE, PARCIAL, PAGADA o VENCIDA
+  fecha_generacion  DateTime @default(now())
+
+  unidad   UnidadResidencial @relation(fields: [id_unidad], references: [id_unidad])
+  detalles DetallePago[]
+
+  @@unique([id_unidad, periodo, concepto])
+  @@map("cuota_administracion")
+}
+
+model Pago {
+  id_pago             Int       @id @default(autoincrement())
+  id_unidad           Int
+  id_usuario          Int
+  id_registrado_por   Int?
+  valor_total         Decimal   @db.Decimal(12, 2)
+  metodo_pago         String    @db.VarChar(20) // PASARELA, TRANSFERENCIA o EFECTIVO
+  referencia_pasarela String?   @unique @db.VarChar(80)
+  estado              String    @default("PENDIENTE") @db.VarChar(15) // PENDIENTE, APROBADO, RECHAZADO o ANULADO
+  fecha_creacion      DateTime  @default(now())
+  fecha_confirmacion  DateTime?
+
+  unidad         UnidadResidencial @relation(fields: [id_unidad], references: [id_unidad])
+  usuario        Usuario           @relation("PagoUsuario", fields: [id_usuario], references: [id_usuario])
+  registrado_por Usuario?          @relation("PagoRegistradoPor", fields: [id_registrado_por], references: [id_usuario])
+  detalles       DetallePago[]
+  comprobante    ComprobantePago?
+
+  @@map("pago")
+}
+
+model DetallePago {
+  id_detalle_pago Int     @id @default(autoincrement())
+  id_pago         Int
+  id_cuota        Int
+  valor_aplicado  Decimal @db.Decimal(12, 2)
+
+  pago  Pago                @relation(fields: [id_pago], references: [id_pago])
+  cuota CuotaAdministracion @relation(fields: [id_cuota], references: [id_cuota])
+
+  @@map("detalle_pago")
+}
+
+model ComprobantePago {
+  id_comprobante     Int      @id @default(autoincrement())
+  id_pago            Int      @unique
+  numero_comprobante String   @unique @db.VarChar(20)
+  url_archivo        String   @db.VarChar(300)
+  fecha_emision      DateTime @default(now())
+
+  pago Pago @relation(fields: [id_pago], references: [id_pago])
+
+  @@map("comprobante_pago")
+}
+
+model Reporte {
+  id_reporte       Int      @id @default(autoincrement())
+  id_conjunto      Int
+  id_usuario       Int
+  tipo             String   @db.VarChar(30) // RECAUDO, CARTERA, ESTADO_CUENTA, PQRS, RESERVAS o VISITAS
+  fecha_inicio     DateTime @db.Date
+  fecha_fin        DateTime @db.Date
+  formato          String   @db.VarChar(5) // PDF o XLSX
+  url_archivo      String?  @db.VarChar(300)
+  fecha_generacion DateTime @default(now())
+
+  conjunto Conjunto @relation(fields: [id_conjunto], references: [id_conjunto])
+  usuario  Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@map("reporte")
+}
+
+// ---------------------------------------------------------------------------
+// Grupo 3: reservas y PQRS
+// ---------------------------------------------------------------------------
+
+model ZonaComun {
+  id_zona               Int      @id @default(autoincrement())
+  id_conjunto           Int
+  nombre                String   @db.VarChar(60)
+  descripcion           String?  @db.VarChar(300)
+  aforo_maximo          Int      @db.SmallInt
+  costo_reserva         Decimal  @default(0) @db.Decimal(10, 2)
+  hora_apertura         DateTime @db.Time(0)
+  hora_cierre           DateTime @db.Time(0)
+  duracion_max_horas    Int      @db.SmallInt
+  anticipacion_max_dias Int      @db.SmallInt
+  reglamento            String?
+  estado                String   @default("ACTIVA") @db.VarChar(15) // ACTIVA, MANTENIMIENTO o INACTIVA
+
+  conjunto Conjunto      @relation(fields: [id_conjunto], references: [id_conjunto])
+  bloqueos BloqueoZona[]
+  reservas Reserva[]
+
+  @@map("zona_comun")
+}
+
+model BloqueoZona {
+  id_bloqueo    Int      @id @default(autoincrement())
+  id_zona       Int
+  id_creado_por Int
+  fecha_inicio  DateTime
+  fecha_fin     DateTime
+  motivo        String   @db.VarChar(200)
+
+  zona       ZonaComun @relation(fields: [id_zona], references: [id_zona])
+  creado_por Usuario   @relation(fields: [id_creado_por], references: [id_usuario])
+
+  @@map("bloqueo_zona")
+}
+
+model Reserva {
+  id_reserva        Int       @id @default(autoincrement())
+  id_zona           Int
+  id_usuario        Int
+  id_unidad         Int
+  fecha_reserva     DateTime  @db.Date
+  hora_inicio       DateTime  @db.Time(0)
+  hora_fin          DateTime  @db.Time(0)
+  numero_asistentes Int       @db.SmallInt
+  valor             Decimal   @default(0) @db.Decimal(10, 2)
+  estado            String    @default("CONFIRMADA") @db.VarChar(15) // CONFIRMADA, CANCELADA o FINALIZADA
+  observaciones     String?   @db.VarChar(300)
+  fecha_creacion    DateTime  @default(now())
+  fecha_cancelacion DateTime?
+
+  zona    ZonaComun         @relation(fields: [id_zona], references: [id_zona])
+  usuario Usuario           @relation(fields: [id_usuario], references: [id_usuario])
+  unidad  UnidadResidencial @relation(fields: [id_unidad], references: [id_unidad])
+
+  @@index([id_zona, fecha_reserva])
+  @@map("reserva")
+}
+
+model Pqrs {
+  id_pqrs          Int       @id @default(autoincrement())
+  numero_radicado  String    @unique @db.VarChar(20)
+  id_usuario       Int
+  id_unidad        Int?
+  id_responsable   Int?
+  tipo             String    @db.VarChar(12) // PETICION, QUEJA, RECLAMO o SUGERENCIA
+  categoria        String    @db.VarChar(30)
+  asunto           String    @db.VarChar(150)
+  descripcion      String
+  prioridad        String    @default("MEDIA") @db.VarChar(10) // BAJA, MEDIA o ALTA
+  estado           String    @default("RADICADA") @db.VarChar(15) // RADICADA, EN_TRAMITE, RESPONDIDA o CERRADA
+  respuesta        String?
+  calificacion     Int?      @db.SmallInt
+  fecha_radicacion DateTime  @default(now())
+  fecha_limite     DateTime  @db.Date
+  fecha_cierre     DateTime?
+
+  solicitante  Usuario            @relation("PqrsSolicitante", fields: [id_usuario], references: [id_usuario])
+  unidad       UnidadResidencial? @relation(fields: [id_unidad], references: [id_unidad])
+  responsable  Usuario?           @relation("PqrsResponsable", fields: [id_responsable], references: [id_usuario])
+  seguimientos PqrsSeguimiento[]
+  adjuntos     PqrsAdjunto[]
+
+  @@map("pqrs")
+}
+
+model PqrsSeguimiento {
+  id_seguimiento  Int      @id @default(autoincrement())
+  id_pqrs         Int
+  id_usuario      Int
+  estado_anterior String?  @db.VarChar(15)
+  estado_nuevo    String   @db.VarChar(15)
+  comentario      String?
+  fecha_registro  DateTime @default(now())
+
+  pqrs    Pqrs    @relation(fields: [id_pqrs], references: [id_pqrs])
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@map("pqrs_seguimiento")
+}
+
+model PqrsAdjunto {
+  id_adjunto     Int      @id @default(autoincrement())
+  id_pqrs        Int
+  nombre_archivo String   @db.VarChar(150)
+  tipo_mime      String   @db.VarChar(60)
+  tamano_kb      Int
+  url_archivo    String   @db.VarChar(300)
+  fecha_carga    DateTime @default(now())
+
+  pqrs Pqrs @relation(fields: [id_pqrs], references: [id_pqrs])
+
+  @@map("pqrs_adjunto")
+}
+
+// ---------------------------------------------------------------------------
+// Grupo 4: comunicaciones, visitantes y parqueaderos
+// ---------------------------------------------------------------------------
+
+model Noticia {
+  id_noticia        Int       @id @default(autoincrement())
+  id_conjunto       Int
+  id_autor          Int
+  id_torre_destino  Int?
+  titulo            String    @db.VarChar(150)
+  contenido         String
+  tipo              String    @db.VarChar(15) // NOTICIA, COMUNICADO o URGENTE
+  publico_objetivo  String    @db.VarChar(20) // TODOS, PROPIETARIOS, RESIDENTES o TORRE
+  estado            String    @default("BORRADOR") @db.VarChar(12) // BORRADOR, PUBLICADA o ARCHIVADA
+  fecha_publicacion DateTime?
+  fecha_expiracion  DateTime?
+  fecha_creacion    DateTime  @default(now())
+
+  conjunto       Conjunto       @relation(fields: [id_conjunto], references: [id_conjunto])
+  autor          Usuario        @relation(fields: [id_autor], references: [id_usuario])
+  torre_destino  Torre?         @relation(fields: [id_torre_destino], references: [id_torre])
+  notificaciones Notificacion[]
+
+  @@map("noticia")
+}
+
+model Notificacion {
+  id_notificacion Int       @id @default(autoincrement())
+  id_usuario      Int
+  id_noticia      Int?
+  tipo            String    @db.VarChar(20) // NOTICIA, RECORDATORIO_PAGO, PQRS, RESERVA o VISITA
+  id_referencia   Int?
+  titulo          String    @db.VarChar(120)
+  mensaje         String    @db.VarChar(300)
+  canal           String    @default("PUSH") @db.VarChar(10) // PUSH o CORREO
+  estado          String    @default("PENDIENTE") @db.VarChar(10) // PENDIENTE, ENVIADA, LEIDA o FALLIDA
+  fecha_creacion  DateTime  @default(now())
+  fecha_envio     DateTime?
+  fecha_lectura   DateTime?
+
+  usuario Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+  noticia Noticia? @relation(fields: [id_noticia], references: [id_noticia])
+
+  @@index([id_usuario, estado])
+  @@map("notificacion")
+}
+
+model Visitante {
+  id_visitante     Int      @id @default(autoincrement())
+  tipo_documento   String   @db.Char(2)
+  numero_documento String   @db.VarChar(20)
+  nombres          String   @db.VarChar(80)
+  apellidos        String   @db.VarChar(80)
+  telefono         String?  @db.VarChar(20)
+  placa_vehiculo   String?  @db.VarChar(10)
+  fecha_registro   DateTime @default(now())
+
+  visitas Visita[]
+
+  @@unique([tipo_documento, numero_documento])
+  @@map("visitante")
+}
+
+model Visita {
+  id_visita          Int       @id @default(autoincrement())
+  id_visitante       Int
+  id_unidad          Int
+  id_anfitrion       Int
+  id_vigilante       Int?
+  fecha_programada   DateTime  @db.Date
+  hora_desde         DateTime  @db.Time(0)
+  hora_hasta         DateTime  @db.Time(0)
+  motivo             String?   @db.VarChar(150)
+  codigo_qr          String    @unique @db.VarChar(120)
+  qr_expira          DateTime
+  ingresa_vehiculo   Boolean   @default(false)
+  estado             String    @default("PREREGISTRADA") @db.VarChar(15) // PREREGISTRADA, INGRESADA, FINALIZADA, VENCIDA o CANCELADA
+  fecha_hora_ingreso DateTime?
+  fecha_hora_salida  DateTime?
+  fecha_creacion     DateTime  @default(now())
+
+  visitante    Visitante               @relation(fields: [id_visitante], references: [id_visitante])
+  unidad       UnidadResidencial       @relation(fields: [id_unidad], references: [id_unidad])
+  anfitrion    Usuario                 @relation("VisitaAnfitrion", fields: [id_anfitrion], references: [id_usuario])
+  vigilante    Usuario?                @relation("VisitaVigilante", fields: [id_vigilante], references: [id_usuario])
+  asignaciones AsignacionParqueadero[]
+
+  @@map("visita")
+}
+
+model Parqueadero {
+  id_parqueadero        Int     @id @default(autoincrement())
+  id_conjunto           Int
+  id_unidad_propietaria Int?
+  codigo                String  @db.VarChar(10)
+  tipo                  String  @db.VarChar(12) // RESIDENTE o VISITANTE
+  ubicacion             String? @db.VarChar(60)
+  estado                String  @default("DISPONIBLE") @db.VarChar(15) // DISPONIBLE, OCUPADO o MANTENIMIENTO
+
+  conjunto           Conjunto                @relation(fields: [id_conjunto], references: [id_conjunto])
+  unidad_propietaria UnidadResidencial?      @relation(fields: [id_unidad_propietaria], references: [id_unidad])
+  asignaciones       AsignacionParqueadero[]
+
+  @@unique([id_conjunto, codigo])
+  @@map("parqueadero")
+}
+
+model AsignacionParqueadero {
+  id_asignacion   Int       @id @default(autoincrement())
+  id_parqueadero  Int
+  id_unidad       Int?
+  id_visita       Int?
+  id_asignado_por Int
+  placa           String    @db.VarChar(10)
+  tipo_vehiculo   String    @db.VarChar(10) // CARRO o MOTO
+  fecha_inicio    DateTime  @default(now())
+  fecha_fin       DateTime?
+  estado          String    @default("ACTIVA") @db.VarChar(10) // ACTIVA o FINALIZADA
+
+  parqueadero  Parqueadero        @relation(fields: [id_parqueadero], references: [id_parqueadero])
+  unidad       UnidadResidencial? @relation(fields: [id_unidad], references: [id_unidad])
+  visita       Visita?            @relation(fields: [id_visita], references: [id_visita])
+  asignado_por Usuario            @relation(fields: [id_asignado_por], references: [id_usuario])
+
+  @@map("asignacion_parqueadero")
+}

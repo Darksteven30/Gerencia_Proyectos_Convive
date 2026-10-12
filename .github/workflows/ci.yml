@@ -1,0 +1,96 @@
+# Integración continua de Convive (Entrega 2, Tabla 4: integración continua; Entrega 3, respuesta al riesgo R03).
+# Compila los tres proyectos, ejecuta las pruebas unitarias y las pruebas de humo de la sección 4.7.
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend:
+    name: Backend (API + pruebas)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: convive
+          POSTGRES_DB: convive
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:convive@localhost:5432/convive?schema=public
+      JWT_SECRET: secreto-solo-para-ci
+      QR_SECRET: secreto-qr-solo-para-ci
+      PAYMENT_PROVIDER: mock
+      PUSH_PROVIDER: log
+      PORT: 3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - name: Migraciones y datos de prueba
+        run: npx prisma migrate deploy && npx prisma db seed
+      - name: Verificación de tipos
+        run: npm run typecheck
+      - name: Pruebas unitarias
+        run: npm test
+      - name: Compilación
+        run: npm run build
+      - name: Pruebas de humo (protocolo de la sección 4.7)
+        # El script llega con la versión 1.0.0, cuando todos los módulos están integrados
+        if: hashFiles('backend/scripts/smoke-test.ts') != ''
+        run: |
+          npm start > servidor.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:3000/health && break; sleep 1; done
+          npm run smoke
+      - name: Registro del servidor
+        if: failure()
+        run: cat servidor.log || true
+
+  web-admin:
+    name: Panel web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web-admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web-admin/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  app-movil:
+    name: App móvil
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app-movil
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app-movil/package-lock.json
+      - run: npm ci
+      - name: Verificación de tipos
+        run: npx tsc --noEmit
