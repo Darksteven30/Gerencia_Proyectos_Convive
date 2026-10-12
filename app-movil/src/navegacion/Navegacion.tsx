@@ -15,6 +15,9 @@ import { ActivarPantalla } from '../pantallas/auth/ActivarPantalla';
 import { IngresoPantalla } from '../pantallas/auth/IngresoPantalla';
 import { RecuperarPantalla } from '../pantallas/auth/RecuperarPantalla';
 import { InicioPantalla } from '../pantallas/InicioPantalla';
+import { HistorialPagosPantalla } from '../pantallas/pagos/HistorialPagosPantalla'; // @RF-02
+import { PagosPantalla } from '../pantallas/pagos/PagosPantalla'; // @RF-02
+import { ResultadoPagoPantalla } from '../pantallas/pagos/ResultadoPagoPantalla'; // @RF-02
 import { PerfilPantalla } from '../pantallas/PerfilPantalla';
 import { colores } from '../tema';
 import { RutasApp, RutasAuth, RutasPestanas, useNavegacion } from './tipos';
@@ -69,6 +72,7 @@ function PestanasPrincipales() {
       })}
     >
       <Pestanas.Screen name="Inicio" component={InicioPantalla} options={{ title: 'Convive', tabBarLabel: 'Inicio' }} />
+      <Pestanas.Screen name="Pagos" component={PagosPantalla} options={{ title: 'Estado de cuenta', tabBarLabel: 'Pagos' }} /> {/* @RF-02 */}
     </Pestanas.Navigator>
   );
 }
@@ -77,6 +81,8 @@ function PilaPrincipal() {
   return (
     <PilaApp.Navigator screenOptions={opcionesEncabezado}>
       <PilaApp.Screen name="Pestanas" component={PestanasPrincipales} options={{ headerShown: false, title: 'Convive' }} />
+      <PilaApp.Screen name="ResultadoPago" component={ResultadoPagoPantalla} options={{ title: 'Resultado del pago' }} /> {/* @RF-02 */}
+      <PilaApp.Screen name="HistorialPagos" component={HistorialPagosPantalla} options={{ title: 'Historial de pagos' }} /> {/* @RF-02 */}
       <PilaApp.Screen name="Perfil" component={PerfilPantalla} options={{ title: 'Mi perfil' }} />
     </PilaApp.Navigator>
   );

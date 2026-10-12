@@ -19,6 +19,7 @@ type Acceso = {
 };
 
 const ACCESOS: Acceso[] = [
+  { texto: 'Pagar cuotas', icono: 'card-outline', destino: 'Pagos' }, // @RF-02
   { texto: 'Mi perfil', icono: 'person-circle-outline', destino: 'Perfil' },
 ];
 
@@ -37,6 +38,7 @@ export function InicioPantalla() {
   const carga = useCarga(async () => {
     let cuenta: EstadoCuentaUnidad[] = [];
     let ultimas: Noticia[] = [];
+    cuenta = await pagos.estadoCuenta(); // @RF-02
     return { cuenta, noticias: ultimas };
   });
 
@@ -63,6 +65,19 @@ export function InicioPantalla() {
           const vencidas = cuenta.reduce((s, u) => s + u.cuotas_vencidas, 0);
           return (
             <>
+              {/* #region @RF-02 */}
+              <Tarjeta estilo={estilos.saldo} alPresionar={() => ir('Pagos')}>
+                <Text style={estilos.saldoEtiqueta}>Saldo pendiente</Text>
+                <Text style={estilos.saldoValor}>{formatoCOP(saldo)}</Text>
+                <Text style={estilos.saldoDetalle}>
+                  {saldo === 0
+                    ? '¡Está al día con la administración!'
+                    : vencidas > 0
+                      ? `${vencidas} cuota(s) vencida(s). Póngase al día para evitar intereses.`
+                      : 'Toque para ver el detalle y pagar en línea.'}
+                </Text>
+              </Tarjeta>
+              {/* #endregion @RF-02 */}
 
               <Seccion titulo="Accesos rápidos">
                 <View style={estilos.rejilla}>
