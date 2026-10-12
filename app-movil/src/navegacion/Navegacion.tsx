@@ -19,6 +19,9 @@ import { HistorialPagosPantalla } from '../pantallas/pagos/HistorialPagosPantall
 import { PagosPantalla } from '../pantallas/pagos/PagosPantalla'; // @RF-02
 import { ResultadoPagoPantalla } from '../pantallas/pagos/ResultadoPagoPantalla'; // @RF-02
 import { PerfilPantalla } from '../pantallas/PerfilPantalla';
+import { MisReservasPantalla } from '../pantallas/reservas/MisReservasPantalla'; // @RF-03
+import { ReservarPantalla } from '../pantallas/reservas/ReservarPantalla'; // @RF-03
+import { ZonasPantalla } from '../pantallas/reservas/ZonasPantalla'; // @RF-03
 import { colores } from '../tema';
 import { RutasApp, RutasAuth, RutasPestanas, useNavegacion } from './tipos';
 
@@ -73,6 +76,7 @@ function PestanasPrincipales() {
     >
       <Pestanas.Screen name="Inicio" component={InicioPantalla} options={{ title: 'Convive', tabBarLabel: 'Inicio' }} />
       <Pestanas.Screen name="Pagos" component={PagosPantalla} options={{ title: 'Estado de cuenta', tabBarLabel: 'Pagos' }} /> {/* @RF-02 */}
+      <Pestanas.Screen name="Reservas" component={ZonasPantalla} options={{ title: 'Zonas comunes', tabBarLabel: 'Reservas' }} /> {/* @RF-03 */}
     </Pestanas.Navigator>
   );
 }
@@ -83,6 +87,8 @@ function PilaPrincipal() {
       <PilaApp.Screen name="Pestanas" component={PestanasPrincipales} options={{ headerShown: false, title: 'Convive' }} />
       <PilaApp.Screen name="ResultadoPago" component={ResultadoPagoPantalla} options={{ title: 'Resultado del pago' }} /> {/* @RF-02 */}
       <PilaApp.Screen name="HistorialPagos" component={HistorialPagosPantalla} options={{ title: 'Historial de pagos' }} /> {/* @RF-02 */}
+      <PilaApp.Screen name="Reservar" component={ReservarPantalla} options={({ route }) => ({ title: route.params.zona.nombre })} /> {/* @RF-03 */}
+      <PilaApp.Screen name="MisReservas" component={MisReservasPantalla} options={{ title: 'Mis reservas' }} /> {/* @RF-03 */}
       <PilaApp.Screen name="Perfil" component={PerfilPantalla} options={{ title: 'Mi perfil' }} />
     </PilaApp.Navigator>
   );
