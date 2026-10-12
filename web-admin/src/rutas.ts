@@ -14,6 +14,7 @@ const R = { A: 'ADMINISTRADOR', J: 'JUNTA', P: 'PORTERIA' } satisfies Record<str
 export const MENU: ItemMenu[] = [
   { ruta: '/tablero', titulo: 'Tablero', icono: '▦', roles: [R.A, R.J], grupo: 'General' }, // @RF-09
   { ruta: '/finanzas', titulo: 'Finanzas', icono: '$', roles: [R.A], grupo: 'Gestión' }, // @RF-02
+  { ruta: '/reportes', titulo: 'Reportes', icono: '▤', roles: [R.A, R.J], grupo: 'General' }, // @RF-08
   { ruta: '/reservas', titulo: 'Reservas', icono: '◷', roles: [R.A], grupo: 'Gestión' }, // @RF-03
   { ruta: '/pqrs', titulo: 'PQRS', icono: '✉', roles: [R.A, R.J], grupo: 'General' }, // @RF-04
   { ruta: '/noticias', titulo: 'Noticias', icono: '✦', roles: [R.A, R.J], grupo: 'General' }, // @RF-05
