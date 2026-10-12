@@ -1,6 +1,6 @@
 {
   "name": "convive-web-admin",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "private": true,
   "description": "Panel administrativo web del prototipo Convive (gestión de conjuntos residenciales)",
   "type": "module",

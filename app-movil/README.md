@@ -66,6 +66,12 @@ Usuarios de prueba: `propietario1@convive-demo.co` / `Propietario#2026` (respons
 `residente1@convive-demo.co` / `Residente#2026` (sin responsabilidad de pago: no ve "Abonar") y
 `junta1@convive-demo.co` / `Junta#2026` (junta y propietaria: ve la sección "General").
 
+## Versión web publicada (Vercel)
+
+La app del servidor de pruebas está en <https://gerencia-proyectos-convive-app-movi.vercel.app>. Vercel la compila con `npx expo export --platform web`
+(Root Directory `app-movil`, preset Other, salida `dist`) y la variable `EXPO_PUBLIC_API_URL` apuntando a la API
+de Render. Su URL debe figurar en `CORS_ORIGIN` del backend. Pasos completos en `docs/DESPLIEGUE.md`, sección 3.
+
 ## APK de prueba (EAS Build)
 
 `eas.json` incluye el perfil `preview`, que genera un **APK** instalable y apunta a la API de Render
