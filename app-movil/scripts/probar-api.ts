@@ -19,7 +19,7 @@ import {
   obtenerTokenRefresco,
   solicitudCruda,
 } from '../src/api/cliente';
-import { auth, noticias, notificaciones, pagos, pqrs, reservas, visitas } from '../src/api/servicios';
+import { admin, auth, noticias, notificaciones, pagos, pqrs, reservas, visitas } from '../src/api/servicios';
 
 let fallos = 0;
 function comprobar(condicion: unknown, descripcion: string) {
@@ -86,6 +86,8 @@ async function main() {
   } else console.log('     (sin pagos aprobados para probar el comprobante)');
   comprobar(Array.isArray(await pqrs.mias()), 'GET /api/pqrs');
   comprobar(Array.isArray(await reservas.mias()), 'GET /api/reservas/mias');
+  const sinPermiso = await esperarError(admin.resumen('mes'));
+  comprobar(sinPermiso?.status === 403, `GET /api/admin/resumen como propietario → 403 (pantalla General oculta)`);
 
   console.log('5. Visita: crear y cancelar');
   const visita = await visitas.crear({
@@ -137,18 +139,28 @@ async function main() {
   }
 
   console.log('9. Invitación, activación, recuperación y PQRS con adjunto');
-  const admin = await auth.iniciarSesion('admin@convive-demo.co', 'Admin#2026', 'WEB');
+  console.log('   Resumen de la pantalla General (junta)');
+  await auth.iniciarSesion('junta1@convive-demo.co', 'Junta#2026', 'WEB');
+  for (const periodo of ['mes', 'trimestre', 'semestre', 'anio'] as const) {
+    const r = await admin.resumen(periodo);
+    const meses = { mes: 1, trimestre: 3, semestre: 6, anio: 12 }[periodo];
+    comprobar(
+      r.periodo === periodo && r.movimientos.length === meses && typeof r.recaudo_periodo === 'number' && Array.isArray(r.pqrs_por_categoria),
+      `GET /api/admin/resumen?periodo=${periodo} (${r.movimientos.length} mes(es), recaudo ${r.recaudo_periodo}, cartera ${r.cartera_pendiente})`,
+    );
+  }
+  const sesionAdmin = await auth.iniciarSesion('admin@convive-demo.co', 'Admin#2026', 'WEB');
   const marca = Date.now();
   const correo = `prueba.app.${marca}@convive-demo.co`;
   // La API exige vincular a los residentes a una unidad: se elige la que tenga menos ocupantes
   const unidades = (await (
-    await fetch(`${API_URL}/api/admin/unidades`, { headers: { Authorization: `Bearer ${admin.accessToken}` } })
+    await fetch(`${API_URL}/api/admin/unidades`, { headers: { Authorization: `Bearer ${sesionAdmin.accessToken}` } })
   ).json()) as { id_unidad: number; ocupantes: unknown[] }[];
   const unidad = [...unidades].sort((a, b) => a.ocupantes.length - b.ocupantes.length)[0];
   const invitacion = (await (
     await fetch(`${API_URL}/api/admin/usuarios`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admin.accessToken}` },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sesionAdmin.accessToken}` },
       body: JSON.stringify({
         tipo_documento: 'CC',
         numero_documento: String(marca).slice(-10),

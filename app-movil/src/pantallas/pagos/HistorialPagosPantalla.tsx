@@ -12,7 +12,7 @@ import { useCarga } from '../../hooks/useCarga';
 import { colores, espacio } from '../../tema';
 import { avisar } from '../../utils/dialogos';
 import { descargarPdf } from '../../utils/descargas';
-import { formatoCOP, formatoFechaHora, formatoPeriodo } from '../../utils/formato';
+import { conceptoCorto, formatoCOP, formatoFechaHora, formatoMesCorto } from '../../utils/formato';
 
 export function HistorialPagosPantalla() {
   const carga = useCarga(pagos.historial);
@@ -46,19 +46,19 @@ export function HistorialPagosPantalla() {
                   {p.unidad} · {formatoFechaHora(p.fecha_confirmacion ?? p.fecha_creacion)}
                 </TextoSecundario>
                 <View style={{ marginTop: espacio.s }}>
-                  <FilaDato etiqueta="Método" valor={p.metodo_pago.toLowerCase()} />
+                  <FilaDato etiqueta="Método" valor={p.metodo_pago.charAt(0) + p.metodo_pago.slice(1).toLowerCase()} />
                   {p.referencia && <FilaDato etiqueta="Referencia" valor={p.referencia} />}
                   <FilaDato etiqueta="Pagado por" valor={p.pagador} />
                   {p.cuotas.map((c, i) => (
                     <Text key={i} style={{ color: colores.textoSecundario, fontSize: 13, marginTop: 2 }}>
-                      • {formatoPeriodo(c.periodo)} ({c.concepto.toLowerCase()}): {formatoCOP(c.valor_aplicado)}
+                      {formatoMesCorto(c.periodo)} — {conceptoCorto(c.concepto)}: {formatoCOP(c.valor_aplicado)}
                     </Text>
                   ))}
                 </View>
                 {p.estado === 'APROBADO' && p.comprobante && (
                   <Boton
-                    titulo={`Comprobante ${p.comprobante}`}
-                    variante="secundario"
+                    titulo={`Descargar comprobante ${p.comprobante}`}
+                    compacto
                     icono="download-outline"
                     cargando={descargando === p.id_pago}
                     alPresionar={() => descargar(p)}

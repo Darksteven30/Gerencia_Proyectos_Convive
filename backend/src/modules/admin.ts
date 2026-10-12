@@ -52,6 +52,74 @@ adminRouter.get('/tablero', requiereRol('ADMINISTRADOR', 'JUNTA'), async (req, r
   });
 });
 
+// --- Resumen financiero y administrativo (pantalla "General" de la app) -----
+// Recaudo frente a cartera por mes, recaudo por concepto, PQRS por categoría y reservas por zona.
+const MESES_PERIODO = { mes: 1, trimestre: 3, semestre: 6, anio: 12 } as const;
+
+adminRouter.get('/resumen', requiereRol('ADMINISTRADOR', 'JUNTA'), async (req, res) => {
+  const { idConjunto } = usuarioActual(req);
+  const { periodo } = z.object({ periodo: z.enum(['mes', 'trimestre', 'semestre', 'anio']).default('mes') }).parse(req.query);
+  const n = MESES_PERIODO[periodo];
+  const [anio, mes] = ahoraColombia().fecha.split('-').map(Number);
+  const meses = Array.from({ length: n }, (_, i) => new Date(Date.UTC(anio, mes - n + i, 1)).toISOString().slice(0, 7));
+  const desde = new Date(`${meses[0]}-01T00:00:00-05:00`);
+  const mesColombia = (d: Date) => new Date(d.getTime() - 5 * 3_600_000).toISOString().slice(0, 7);
+
+  const [pagos, cuotasPeriodo, cartera, detalles, pqrs, reservas] = await Promise.all([
+    prisma.pago.findMany({
+      where: { unidad: { id_conjunto: idConjunto }, estado: 'APROBADO', fecha_confirmacion: { gte: desde } },
+      select: { valor_total: true, fecha_confirmacion: true },
+    }),
+    prisma.cuotaAdministracion.findMany({
+      where: { unidad: { id_conjunto: idConjunto }, periodo: { in: meses } },
+      select: { periodo: true, valor: true, saldo: true },
+    }),
+    prisma.cuotaAdministracion.aggregate({
+      where: { unidad: { id_conjunto: idConjunto }, estado: { in: ['PENDIENTE', 'PARCIAL', 'VENCIDA'] } },
+      _sum: { saldo: true },
+    }),
+    prisma.detallePago.findMany({
+      where: { pago: { unidad: { id_conjunto: idConjunto }, estado: 'APROBADO', fecha_confirmacion: { gte: desde } } },
+      select: { valor_aplicado: true, cuota: { select: { concepto: true } } },
+    }),
+    prisma.pqrs.findMany({
+      where: { fecha_radicacion: { gte: desde }, solicitante: { roles: { some: { id_conjunto: idConjunto } } } },
+      select: { categoria: true },
+    }),
+    prisma.reserva.findMany({
+      where: { zona: { id_conjunto: idConjunto }, estado: { not: 'CANCELADA' }, fecha_reserva: { gte: fechaADate(`${meses[0]}-01`) } },
+      select: { zona: { select: { nombre: true } } },
+    }),
+  ]);
+
+  const agrupar = (claves: string[]) =>
+    Object.entries(claves.reduce<Record<string, number>>((acc, k) => ({ ...acc, [k]: (acc[k] ?? 0) + 1 }), {}))
+      .map(([nombre, cantidad]) => ({ nombre, cantidad }))
+      .sort((a, b) => b.cantidad - a.cantidad);
+
+  const porConcepto: Record<string, number> = {};
+  for (const d of detalles) porConcepto[d.cuota.concepto] = (porConcepto[d.cuota.concepto] ?? 0) + Number(d.valor_aplicado);
+
+  res.json({
+    periodo,
+    desde: meses[0],
+    hasta: meses[meses.length - 1],
+    recaudo_periodo: pagos.reduce((s, p) => s + Number(p.valor_total), 0),
+    facturado_periodo: cuotasPeriodo.reduce((s, c) => s + Number(c.valor), 0),
+    cartera_pendiente: Number(cartera._sum.saldo ?? 0),
+    movimientos: meses.map((m) => ({
+      mes: m,
+      recaudado: pagos.filter((p) => p.fecha_confirmacion && mesColombia(p.fecha_confirmacion) === m).reduce((s, p) => s + Number(p.valor_total), 0),
+      pendiente: cuotasPeriodo.filter((c) => c.periodo === m).reduce((s, c) => s + Number(c.saldo), 0),
+    })),
+    recaudo_por_concepto: Object.entries(porConcepto)
+      .map(([nombre, valor]) => ({ nombre, valor }))
+      .sort((a, b) => b.valor - a.valor),
+    pqrs_por_categoria: agrupar(pqrs.map((p) => p.categoria)),
+    reservas_por_zona: agrupar(reservas.map((r) => r.zona.nombre)),
+  });
+});
+
 // --- Conjunto (CU-08) ------------------------------------------------------
 adminRouter.get('/conjunto', soloAdmin, async (req, res) => {
   const { idConjunto } = usuarioActual(req);

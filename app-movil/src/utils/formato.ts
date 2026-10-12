@@ -12,6 +12,26 @@ export function formatoCOP(valor: number | null | undefined): string {
   return formatoPesos.format(Number(valor ?? 0));
 }
 
+const formatoPesosCompleto = new Intl.NumberFormat('es-CO', {
+  style: 'currency',
+  currency: 'COP',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+/** Monto destacado con centavos, como en los mockups: "$ 45.678,90". */
+export function formatoCOPCompleto(valor: number | null | undefined): string {
+  return formatoPesosCompleto.format(Number(valor ?? 0));
+}
+
+/** Monto abreviado para ejes de gráficos: 1.250.000 → "$1,3 M"; 85.000 → "$85 mil". */
+export function formatoCOPCorto(valor: number): string {
+  const v = Math.abs(valor);
+  if (v >= 1_000_000) return `$${(valor / 1_000_000).toLocaleString('es-CO', { maximumFractionDigits: 1 })} M`;
+  if (v >= 1_000) return `$${Math.round(valor / 1_000)} mil`;
+  return `$${Math.round(valor)}`;
+}
+
 const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 const MESES_LARGOS = [
   'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
@@ -31,6 +51,27 @@ export function formatoPeriodo(periodo: string): string {
   const [a, m] = periodo.split('-').map(Number);
   if (!a || !m) return periodo;
   return `${MESES_LARGOS[m - 1]} ${a}`;
+}
+
+/** Periodo AAAA-MM → "Ago 2026" (renglones del historial y ejes de los gráficos). */
+export function formatoMesCorto(periodo: string): string {
+  const [a, m] = periodo.split('-').map(Number);
+  if (!a || !m) return periodo;
+  const mes = MESES[m - 1];
+  return `${mes.charAt(0).toUpperCase()}${mes.slice(1)} ${a}`;
+}
+
+export const NOMBRES_MESES = MESES_LARGOS.map((m) => m.charAt(0).toUpperCase() + m.slice(1));
+
+/** Nombre corto del concepto de una cuota ("ORDINARIA" → "Cuota admón."). */
+export function conceptoCorto(concepto: string): string {
+  const nombres: Record<string, string> = {
+    ORDINARIA: 'Cuota admón.',
+    EXTRAORDINARIA: 'Cuota extraordinaria',
+    MULTA: 'Multa',
+    INTERES_MORA: 'Interés de mora',
+  };
+  return nombres[concepto] ?? etiquetaEstado(concepto);
 }
 
 /** Desplaza una marca de tiempo UTC a la hora de Colombia (UTC-5, sin horario de verano). */

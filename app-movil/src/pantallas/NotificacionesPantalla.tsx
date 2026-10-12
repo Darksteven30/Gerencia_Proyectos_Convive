@@ -6,10 +6,10 @@ import { Text, View } from 'react-native';
 import { mensajeError } from '../api/cliente';
 import { notificaciones } from '../api/servicios';
 import type { Notificacion } from '../api/tipos';
-import { Boton, Contenido, EstadoVacio, Icono, Pantalla, Tarjeta, TextoSecundario } from '../componentes/ui';
+import { Boton, Contenido, EstadoVacio, Icono, Pastilla, Pantalla, Tarjeta, TextoSecundario } from '../componentes/ui';
 import { useNotificaciones } from '../contexto/NotificacionesContext';
 import { useCarga } from '../hooks/useCarga';
-import { useNavegacion } from '../navegacion/tipos';
+import { irAPestana, useNavegacion } from '../navegacion/tipos';
 import { colores, espacio } from '../tema';
 import { avisar } from '../utils/dialogos';
 import { formatoFechaHora } from '../utils/formato';
@@ -59,8 +59,8 @@ export function NotificacionesPantalla() {
     else if (n.tipo === 'RESERVA' || n.tipo === 'BLOQUEO') navegacion.navigate('MisReservas');
     // La confirmación de un pago llega como RECORDATORIO_PAGO con el título "Pago aprobado/rechazado"
     else if (n.tipo === 'PAGO' || (n.tipo === 'RECORDATORIO_PAGO' && /^pago /i.test(n.titulo))) navegacion.navigate('HistorialPagos');
-    else if (n.tipo === 'RECORDATORIO_PAGO') navegacion.navigate('Pagos');
-    else if (n.tipo === 'VISITA') navegacion.navigate('Visitas');
+    else if (n.tipo === 'RECORDATORIO_PAGO') irAPestana(navegacion, 'Pagos');
+    else if (n.tipo === 'VISITA') irAPestana(navegacion, 'Visitas');
   };
 
   const marcarTodas = async () => {
@@ -78,6 +78,7 @@ export function NotificacionesPantalla() {
 
   return (
     <Pantalla refrescando={carga.refrescando} alRefrescar={carga.refrescar}>
+      <Pastilla texto="Avisos" estilo={{ marginBottom: espacio.m }} />
       <Contenido cargando={carga.cargando} error={carga.error} datos={carga.datos} alReintentar={carga.recargar}>
         {(b) =>
           b.notificaciones.length === 0 ? (
@@ -86,7 +87,7 @@ export function NotificacionesPantalla() {
             <>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: espacio.m }}>
                 <TextoSecundario>{b.no_leidas > 0 ? `${b.no_leidas} sin leer` : 'Todas leídas'}</TextoSecundario>
-                {b.no_leidas > 0 && <Boton titulo="Marcar todas como leídas" variante="texto" alPresionar={marcarTodas} cargando={marcando} />}
+                {b.no_leidas > 0 && <Boton titulo="Marcar todas como leídas" variante="texto" compacto alPresionar={marcarTodas} cargando={marcando} />}
               </View>
               {b.notificaciones.map((n) => {
                 const noLeida = !n.fecha_lectura;
@@ -94,11 +95,12 @@ export function NotificacionesPantalla() {
                   <Tarjeta
                     key={n.id_notificacion}
                     alPresionar={() => abrir(n)}
-                    estilo={noLeida ? { borderLeftWidth: 4, borderLeftColor: colores.primario, backgroundColor: colores.primarioSuave } : undefined}
+                    estilo={noLeida ? { borderLeftWidth: 4, borderLeftColor: colores.turquesa, backgroundColor: colores.grisClaro } : undefined}
+                    etiquetaAccesible={`${noLeida ? 'Sin leer: ' : ''}${n.titulo}. ${n.mensaje}`}
                   >
                     <View style={{ flexDirection: 'row' }}>
                       <View style={{ marginRight: espacio.m, marginTop: 2 }}>
-                        <Icono nombre={ICONOS[n.tipo] ?? 'notifications-outline'} tamano={22} color={noLeida ? colores.primario : colores.textoSecundario} />
+                        <Icono nombre={ICONOS[n.tipo] ?? 'notifications-outline'} tamano={22} color={noLeida ? colores.turquesaOscuro : colores.textoSecundario} />
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={{ fontWeight: noLeida ? '800' : '600', color: colores.texto, fontSize: 15 }}>{n.titulo}</Text>

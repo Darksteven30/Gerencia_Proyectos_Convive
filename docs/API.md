@@ -39,6 +39,7 @@ Contraseña: mínimo 8 caracteres, una mayúscula y un número. Cinco intentos f
 | Método | Ruta | Rol | Descripción |
 |---|---|---|---|
 | GET | `/tablero` | ADMIN, JUNTA | `{ unidades, usuarios, carteraPendiente, cuotasPendientes, recaudoMes, pqrsAbiertas, reservasHoy, visitasHoy }` |
+| GET | `/resumen?periodo=mes\|trimestre\|semestre\|anio` | ADMIN, JUNTA | `{ periodo, desde, hasta, recaudo_periodo, facturado_periodo, cartera_pendiente, movimientos: [{ mes, recaudado, pendiente }], recaudo_por_concepto: [{ nombre, valor }], pqrs_por_categoria: [{ nombre, cantidad }], reservas_por_zona: [{ nombre, cantidad }] }` (pantalla "General" de la app) |
 | GET / PUT | `/conjunto` | ADMIN | Datos del conjunto (`nombre, nit, direccion, ciudad, departamento, telefono, correo_contacto, numero_unidades`) |
 | GET | `/torres` | todos | `[{ id_torre, nombre, numero_pisos, unidades }]` |
 | POST | `/torres` | ADMIN | `{ nombre, numero_pisos? }` |

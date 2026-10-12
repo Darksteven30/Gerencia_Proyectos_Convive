@@ -67,7 +67,7 @@ export function DetalleVisitaPantalla({ route, navigation }: PropsApp<'DetalleVi
         </TextoSecundario>
         {activa ? (
           <>
-            <View style={{ padding: espacio.l, backgroundColor: colores.blanco, borderRadius: 16, marginTop: espacio.l }}>
+            <View style={{ padding: espacio.l, backgroundColor: colores.blanco, borderRadius: 16, marginTop: espacio.l, borderWidth: 1, borderColor: colores.borde }}>
               <QRCode value={visita.codigo_qr!} size={240} color={colores.texto} backgroundColor={colores.blanco} />
             </View>
             <Text selectable style={{ marginTop: espacio.m, color: colores.textoSecundario, fontSize: 12, textAlign: 'center' }}>
