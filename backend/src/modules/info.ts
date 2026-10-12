@@ -2,7 +2,7 @@
 export const infoApi = {
   nombre: 'Convive API',
   descripcion: 'Prototipo funcional de la aplicación para la gestión de conjuntos residenciales y propiedad horizontal',
-  version: '1.2.1',
+  version: '1.2.2',
   salud: '/health',
   documentacion: 'Ver docs/API.md en el repositorio',
   modulos: {
