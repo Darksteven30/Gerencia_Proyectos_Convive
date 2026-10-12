@@ -3,10 +3,10 @@
  * (No usa un date picker nativo para funcionar igual en Android, iOS y web.)
  */
 import React from 'react';
-import { ScrollView, Pressable, Text, View } from 'react-native';
-import { colores, espacio } from '../tema';
+import { ScrollView, Text, View } from 'react-native';
+import { espacio } from '../tema';
 import { etiquetaDia, fechaValida, hoyColombia, mascaraFecha, sumarDias } from '../utils/formato';
-import { Campo, estilos } from './ui';
+import { Campo, Chip, estilos } from './ui';
 
 export function SelectorFecha({
   etiqueta,
@@ -29,18 +29,7 @@ export function SelectorFecha({
       <Text style={estilos.etiqueta}>{etiqueta}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: espacio.s }} contentContainerStyle={{ gap: espacio.s }}>
         {atajos.map((f) => {
-          const activo = f === valor;
-          return (
-            <Pressable
-              key={f}
-              onPress={() => alCambiar(f)}
-              style={[estilos.chip, activo && estilos.chipActivo]}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: activo }}
-            >
-              <Text style={[estilos.textoChip, activo && { color: colores.blanco }]}>{etiquetaDia(f)}</Text>
-            </Pressable>
-          );
+          return <Chip key={f} texto={etiquetaDia(f)} rol="radio" activo={f === valor} alPresionar={() => alCambiar(f)} />;
         })}
       </ScrollView>
       <Campo

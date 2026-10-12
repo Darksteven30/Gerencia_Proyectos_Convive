@@ -2,10 +2,12 @@
  * CU-03 Recuperar contraseña: solicitar el código y restablecer la contraseña.
  */
 import React, { useState } from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { mensajeError } from '../../api/cliente';
 import { auth } from '../../api/servicios';
-import { Aviso, Boton, Campo, Pantalla, Tarjeta, TextoSecundario } from '../../componentes/ui';
+import { Logo } from '../../componentes/Marca';
+import { Aviso, Boton, Campo, Pantalla, TextoSecundario } from '../../componentes/ui';
+import { ListaRequisitos } from '../CambiarContrasenaPantalla';
 import type { PropsAuth } from '../../navegacion/tipos';
 import { colores, espacio } from '../../tema';
 import { avisar } from '../../utils/dialogos';
@@ -56,13 +58,16 @@ export function RecuperarPantalla({ navigation }: PropsAuth<'Recuperar'>) {
   };
 
   return (
-    <Pantalla estilo={{ maxWidth: 520, width: '100%', alignSelf: 'center' }}>
-      <TextoSecundario estilo={{ marginBottom: espacio.l }}>
-        {paso === 1
-          ? 'Escriba el correo de su cuenta. Le enviaremos un código para crear una nueva contraseña.'
-          : 'Ingrese el código recibido y su nueva contraseña.'}
-      </TextoSecundario>
-      <Tarjeta>
+    <Pantalla estilo={{ maxWidth: 480, width: '100%', alignSelf: 'center', paddingHorizontal: espacio.xl }}>
+      <View style={{ alignItems: 'center', marginBottom: espacio.l }}>
+        <Logo tamano={56} />
+        <TextoSecundario estilo={{ textAlign: 'center', marginTop: espacio.m }}>
+          {paso === 1
+            ? 'Escriba el correo de su cuenta. Le enviaremos un código para crear una nueva contraseña.'
+            : 'Ingrese el código recibido y su nueva contraseña.'}
+        </TextoSecundario>
+      </View>
+      <View>
         {error && <Aviso tono="peligro" texto={error} />}
         {paso === 1 ? (
           <>
@@ -76,7 +81,7 @@ export function RecuperarPantalla({ navigation }: PropsAuth<'Recuperar'>) {
               placeholder="nombre@correo.com"
               onSubmitEditing={solicitar}
             />
-            <Boton titulo="Enviar código" icono="mail-outline" alPresionar={solicitar} cargando={enviando} />
+            <Boton titulo="Enviar código" variante="oscuro" icono="mail-outline" alPresionar={solicitar} cargando={enviando} />
           </>
         ) : (
           <>
@@ -103,14 +108,14 @@ export function RecuperarPantalla({ navigation }: PropsAuth<'Recuperar'>) {
               secureTextEntry
               autoCapitalize="none"
               textContentType="newPassword"
-              ayuda="Mínimo 8 caracteres, una mayúscula y un número"
             />
             <Campo etiqueta="Confirmar contraseña" value={confirmacion} onChangeText={setConfirmacion} secureTextEntry autoCapitalize="none" />
+            <ListaRequisitos contrasena={contrasena} confirmacion={confirmacion} />
             <Boton titulo="Restablecer contraseña" icono="key-outline" alPresionar={restablecer} cargando={enviando} />
             <Boton titulo="Solicitar otro código" variante="texto" alPresionar={() => setPaso(1)} estilo={{ marginTop: espacio.s }} />
           </>
         )}
-      </Tarjeta>
+      </View>
     </Pantalla>
   );
 }

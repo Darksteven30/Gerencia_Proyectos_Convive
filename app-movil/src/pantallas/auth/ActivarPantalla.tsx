@@ -5,7 +5,9 @@ import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { mensajeError } from '../../api/cliente';
 import { auth } from '../../api/servicios';
-import { Aviso, Boton, Campo, Casilla, Pantalla, Subtitulo, Tarjeta, TextoSecundario } from '../../componentes/ui';
+import { Logo } from '../../componentes/Marca';
+import { Aviso, Boton, Campo, Casilla, Pastilla, Pantalla, TextoSecundario } from '../../componentes/ui';
+import { ListaRequisitos } from '../CambiarContrasenaPantalla';
 import type { PropsAuth } from '../../navegacion/tipos';
 import { colores, espacio, radio } from '../../tema';
 import { avisar } from '../../utils/dialogos';
@@ -53,11 +55,14 @@ export function ActivarPantalla({ navigation }: PropsAuth<'Activar'>) {
   };
 
   return (
-    <Pantalla estilo={{ maxWidth: 560, width: '100%', alignSelf: 'center' }}>
-      <TextoSecundario estilo={{ marginBottom: espacio.l }}>
-        Ingrese el correo registrado por la administración y el código de invitación que recibió. Luego cree su contraseña.
-      </TextoSecundario>
-      <Tarjeta>
+    <Pantalla estilo={{ maxWidth: 480, width: '100%', alignSelf: 'center', paddingHorizontal: espacio.xl }}>
+      <View style={{ alignItems: 'center', marginBottom: espacio.l }}>
+        <Logo tamano={56} />
+        <TextoSecundario estilo={{ textAlign: 'center', marginTop: espacio.m }}>
+          Ingrese el correo registrado por la administración y el código de invitación que recibió. Luego cree su contraseña.
+        </TextoSecundario>
+      </View>
+      <View>
         {errorApi && <Aviso tono="peligro" texto={errorApi} />}
         <Campo
           etiqueta="Correo electrónico"
@@ -85,7 +90,6 @@ export function ActivarPantalla({ navigation }: PropsAuth<'Activar'>) {
           secureTextEntry
           autoCapitalize="none"
           textContentType="newPassword"
-          ayuda="Mínimo 8 caracteres, una mayúscula y un número"
           error={errores.contrasena}
         />
         <Campo
@@ -96,9 +100,10 @@ export function ActivarPantalla({ navigation }: PropsAuth<'Activar'>) {
           autoCapitalize="none"
           error={errores.confirmacion}
         />
+        <ListaRequisitos contrasena={contrasena} confirmacion={confirmacion} />
 
-        <Subtitulo estilo={{ marginTop: espacio.s, marginBottom: espacio.s }}>Tratamiento de datos personales</Subtitulo>
-        <View style={{ backgroundColor: colores.primarioSuave, borderRadius: radio.m, padding: espacio.m }}>
+        <Pastilla texto="Tratamiento de datos personales" estilo={{ marginTop: espacio.s, marginBottom: espacio.s }} />
+        <View style={{ backgroundColor: colores.grisClaro, borderRadius: radio.m, padding: espacio.m }}>
           <Text style={{ color: colores.texto, fontSize: 13, lineHeight: 19 }}>{TEXTO_POLITICA_DATOS}</Text>
         </View>
         <Casilla marcada={acepta} alCambiar={setAcepta}>
@@ -109,7 +114,7 @@ export function ActivarPantalla({ navigation }: PropsAuth<'Activar'>) {
         {errores.acepta && <Text style={{ color: colores.peligro, marginBottom: espacio.m }}>{errores.acepta}</Text>}
 
         <Boton titulo="Activar cuenta" icono="checkmark-circle-outline" alPresionar={activar} cargando={enviando} deshabilitado={!acepta} />
-      </Tarjeta>
+      </View>
     </Pantalla>
   );
 }

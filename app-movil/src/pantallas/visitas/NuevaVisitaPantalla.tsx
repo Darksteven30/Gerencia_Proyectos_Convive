@@ -147,7 +147,7 @@ export function NuevaVisitaPantalla({ navigation }: PropsApp<'NuevaVisita'>) {
             />
           </View>
           <Campo etiqueta="Motivo (opcional)" value={motivo} onChangeText={setMotivo} maxLength={150} placeholder="Ej.: visita familiar" />
-          <Boton titulo="Generar código QR" icono="qr-code-outline" alPresionar={guardar} cargando={enviando} />
+          <Boton titulo="Generar código QR" icono="qr-code-outline" estilo={{ marginTop: espacio.s }} alPresionar={guardar} cargando={enviando} />
         </Tarjeta>
       </Seccion>
     </Pantalla>

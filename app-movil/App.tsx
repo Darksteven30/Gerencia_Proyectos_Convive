@@ -12,10 +12,10 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <NotificacionesProvider> {/* @RF-05 */}
+        <NotificacionesProvider>{/* @RF-05 */}
           <StatusBar style="dark" />
           <Navegacion />
-        </NotificacionesProvider> {/* @RF-05 */}
+        </NotificacionesProvider>{/* @RF-05 */}
       </AuthProvider>
     </SafeAreaProvider>
   );
