@@ -14,7 +14,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://convive-api.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://convive-api-mn8i.onrender.com"
       }
     },
     "production": {

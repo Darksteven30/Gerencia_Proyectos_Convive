@@ -11,8 +11,20 @@ administrativo web y la aplicación móvil, construidos según el diseño UML y 
 |---|---|---|---|
 | [`backend/`](backend/) | API REST, lógica de negocio y base de datos | Node.js + Express + TypeScript, Prisma ORM, PostgreSQL, JWT + bcrypt | Render |
 | [`web-admin/`](web-admin/) | Panel administrativo (Administrador, Junta, Portería) | React + Vite + TypeScript | Vercel |
-| [`app-movil/`](app-movil/) | App para propietarios y residentes | React Native + Expo (Android, iOS y web) | Expo / EAS |
+| [`app-movil/`](app-movil/) | App para propietarios y residentes | React Native + Expo (Android, iOS y web) | Vercel (versión web) / Expo Go |
 | [`docs/`](docs/) | Contrato de la API y guía de despliegue | Markdown | — |
+
+## Servidor de pruebas público
+
+| Componente | URL |
+|---|---|
+| API REST (Render) | <https://convive-api-mn8i.onrender.com> · estado: <https://convive-api-mn8i.onrender.com/health> |
+| Panel administrativo web (Vercel) | <https://gerencia-proyectos-convive.vercel.app> |
+| App móvil, versión web (Vercel) | <https://gerencia-proyectos-convive-app-movi.vercel.app> |
+
+El plan gratuito de Render suspende el servicio tras un periodo sin uso: la primera petición puede tardar cerca
+de un minuto. Abra primero `/health`. La app se revisa desde el navegador del teléfono o, en un computador, con
+el modo de dispositivo móvil del navegador (F12).
 
 ## Arranque rápido (entorno local, Windows)
 
@@ -71,7 +83,7 @@ Estas credenciales son exclusivas del entorno de pruebas y deben eliminarse ante
 | RF-09 Panel web | 3.0 / 4.1 | Configuración del conjunto, torres, unidades, usuarios y roles |
 
 **Limitaciones del prototipo** (coherentes con la sección 4.9 de la Entrega 3): la pasarela opera en modo de
-pruebas; la app se distribuye como versión de prueba (Expo/APK), no en tiendas; el envío de correos se reemplaza
+pruebas; la app se publica como versión web en Vercel y puede ejecutarse con Expo Go, sin publicación en tiendas; el envío de correos se reemplaza
 por códigos visibles en modo demostración; los archivos subidos en el plan gratuito de Render no son persistentes
 (los comprobantes se regeneran al descargarlos).
 

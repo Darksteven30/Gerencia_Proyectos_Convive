@@ -1,6 +1,15 @@
 # Guía de despliegue en el servidor de pruebas
 
 Implementa los pasos 6 a 10 del instructivo de instalación y despliegue (Entrega 3, sección 4.4).
+
+Despliegue vigente del proyecto (las URL de esta guía son de ejemplo; cada cuenta obtiene las suyas):
+
+| Componente | URL |
+|---|---|
+| API (Render) | https://convive-api-mn8i.onrender.com |
+| Panel web (Vercel) | https://gerencia-proyectos-convive.vercel.app |
+| App móvil, versión web (Vercel) | https://gerencia-proyectos-convive-app-movi.vercel.app |
+
 Antes de empezar, el código debe estar en GitHub (rama `main`).
 
 ## 1. Backend y base de datos en Render (pasos 6 a 8)
@@ -14,7 +23,8 @@ Antes de empezar, el código debe estar en GitHub (rama `main`).
    `prisma db seed` (carga los usuarios de prueba si no existen).
 4. En **convive-api → Environment**, complete las variables marcadas como pendientes:
    - `PUBLIC_API_URL` = la URL del servicio, por ejemplo `https://convive-api.onrender.com`
-   - `CORS_ORIGIN` = la URL del panel en Vercel (paso 2) y, si desea, `http://localhost:5173,http://localhost:8081`
+   - `CORS_ORIGIN` = las URL del panel (paso 2) y de la app web (paso 3) en Vercel, separadas por comas, y, si desea,
+     `http://localhost:5173,http://localhost:8081`
 5. Verifique: abra `https://convive-api.onrender.com/health` → debe responder `{"estado":"ok","baseDatos":"ok",...}`.
 
 > **Plan gratuito de Render.** El servicio se suspende tras unos minutos sin uso y la primera petición puede tardar
@@ -58,7 +68,21 @@ eas build --profile preview --platform android
 
 Al terminar, EAS entrega un enlace y un QR para descargar el APK; compártalo con los usuarios piloto.
 
-Opción C, **versión web** de la app: `npx expo start --web` (útil para mostrarla desde un computador).
+Opción C, **versión web publicada en Vercel** (la que usa el servidor de pruebas; no requiere instalar nada en
+el teléfono):
+
+1. En Vercel, **Add New → Project**, importe de nuevo el mismo repositorio y configure:
+   - **Root Directory:** `app-movil`
+   - **Framework Preset:** Other
+   - **Build Command:** `npx expo export --platform web`
+   - **Output Directory:** `dist`
+   - **Environment Variables:** `EXPO_PUBLIC_API_URL` = la URL de la API en Render, sin `/` final
+2. Pulse **Deploy**. La variable se incrusta al compilar: si la cambia, vuelva a desplegar (**Redeploy**).
+3. Agregue la URL que entrega Vercel a `CORS_ORIGIN` en Render (paso 1.4); sin ese paso, el inicio de sesión
+   falla con un error de red.
+4. Abra la URL desde el navegador del teléfono o, en un computador, con el modo de dispositivo móvil (F12).
+
+Para probar la versión web en local sin publicarla: `npx expo start --web`.
 
 ## 4. Verificación del despliegue (sección 4.7)
 
