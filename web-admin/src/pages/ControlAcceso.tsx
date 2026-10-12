@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react';
 import { ApiError, http } from '../api/client';
 import type { Parqueadero, Visita } from '../api/tipos';
 import { LectorQR } from '../components/LectorQR';
+import { Icono } from '../components/Marca';
 import { Alerta, BotonCarga, Campo, EncabezadoPagina } from '../components/ui';
 import { useAccion, useCarga } from '../hooks/useCarga';
 import { formatoFecha, formatoFechaHora } from '../utils/formato';
@@ -83,9 +84,7 @@ export function ControlAcceso() {
           )}
           {!resultado && !validando && (
             <div className="estado-vista" style={{ minHeight: 280, justifyContent: 'center' }}>
-              <span style={{ fontSize: '2rem' }} aria-hidden="true">
-                ⛨
-              </span>
+              <Icono nombre="acceso" tamano={40} />
               <span>El resultado de la validación aparecerá aquí.</span>
             </div>
           )}

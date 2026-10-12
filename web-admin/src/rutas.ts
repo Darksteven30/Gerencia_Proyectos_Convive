@@ -4,6 +4,7 @@ import type { Rol } from './api/client';
 export interface ItemMenu {
   ruta: string;
   titulo: string;
+  /** Nombre del icono SVG (ver components/Marca.tsx). */
   icono: string;
   roles: Rol[];
   grupo: 'General' | 'Gestión' | 'Portería' | 'Sistema';
@@ -12,19 +13,19 @@ export interface ItemMenu {
 const R = { A: 'ADMINISTRADOR', J: 'JUNTA', P: 'PORTERIA' } satisfies Record<string, Rol>;
 
 export const MENU: ItemMenu[] = [
-  { ruta: '/tablero', titulo: 'Tablero', icono: '▦', roles: [R.A, R.J], grupo: 'General' }, // @RF-09
-  { ruta: '/finanzas', titulo: 'Finanzas', icono: '$', roles: [R.A], grupo: 'Gestión' }, // @RF-02
-  { ruta: '/reportes', titulo: 'Reportes', icono: '▤', roles: [R.A, R.J], grupo: 'General' }, // @RF-08
-  { ruta: '/reservas', titulo: 'Reservas', icono: '◷', roles: [R.A], grupo: 'Gestión' }, // @RF-03
-  { ruta: '/pqrs', titulo: 'PQRS', icono: '✉', roles: [R.A, R.J], grupo: 'General' }, // @RF-04
-  { ruta: '/noticias', titulo: 'Noticias', icono: '✦', roles: [R.A, R.J], grupo: 'General' }, // @RF-05
-  { ruta: '/usuarios', titulo: 'Usuarios', icono: '☺', roles: [R.A], grupo: 'Gestión' }, // @RF-01
-  { ruta: '/unidades', titulo: 'Unidades y torres', icono: '⌂', roles: [R.A], grupo: 'Gestión' }, // @RF-09
-  { ruta: '/acceso', titulo: 'Control de acceso', icono: '⛨', roles: [R.A, R.P], grupo: 'Portería' }, // @RF-06
-  { ruta: '/visitas', titulo: 'Visitas del día', icono: '☷', roles: [R.A, R.P], grupo: 'Portería' }, // @RF-06
-  { ruta: '/parqueaderos', titulo: 'Parqueaderos', icono: 'P', roles: [R.A, R.P], grupo: 'Portería' }, // @RF-07
-  { ruta: '/auditoria', titulo: 'Auditoría', icono: '⚑', roles: [R.A], grupo: 'Sistema' }, // @RF-09
-  { ruta: '/conjunto', titulo: 'Conjunto', icono: '⚙', roles: [R.A], grupo: 'Sistema' }, // @RF-09
+  { ruta: '/tablero', titulo: 'Tablero', icono: 'tablero', roles: [R.A, R.J], grupo: 'General' }, // @RF-09
+  { ruta: '/finanzas', titulo: 'Finanzas', icono: 'finanzas', roles: [R.A], grupo: 'Gestión' }, // @RF-02
+  { ruta: '/reportes', titulo: 'Reportes', icono: 'reportes', roles: [R.A, R.J], grupo: 'General' }, // @RF-08
+  { ruta: '/reservas', titulo: 'Reservas', icono: 'reservas', roles: [R.A], grupo: 'Gestión' }, // @RF-03
+  { ruta: '/pqrs', titulo: 'PQRS', icono: 'pqrs', roles: [R.A, R.J], grupo: 'General' }, // @RF-04
+  { ruta: '/noticias', titulo: 'Noticias', icono: 'noticias', roles: [R.A, R.J], grupo: 'General' }, // @RF-05
+  { ruta: '/usuarios', titulo: 'Usuarios', icono: 'usuarios', roles: [R.A], grupo: 'Gestión' }, // @RF-01
+  { ruta: '/unidades', titulo: 'Unidades y torres', icono: 'unidades', roles: [R.A], grupo: 'Gestión' }, // @RF-09
+  { ruta: '/acceso', titulo: 'Control de acceso', icono: 'acceso', roles: [R.A, R.P], grupo: 'Portería' }, // @RF-06
+  { ruta: '/visitas', titulo: 'Visitas del día', icono: 'visitas', roles: [R.A, R.P], grupo: 'Portería' }, // @RF-06
+  { ruta: '/parqueaderos', titulo: 'Parqueaderos', icono: 'parqueaderos', roles: [R.A, R.P], grupo: 'Portería' }, // @RF-07
+  { ruta: '/auditoria', titulo: 'Auditoría', icono: 'auditoria', roles: [R.A], grupo: 'Sistema' }, // @RF-09
+  { ruta: '/conjunto', titulo: 'Conjunto', icono: 'conjunto', roles: [R.A], grupo: 'Sistema' }, // @RF-09
 ];
 
 export const menuParaRoles = (roles: Rol[]) => MENU.filter((m) => m.roles.some((r) => roles.includes(r)));
