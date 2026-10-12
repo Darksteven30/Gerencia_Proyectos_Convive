@@ -19,6 +19,8 @@ export const MENU: ItemMenu[] = [
   { ruta: '/noticias', titulo: 'Noticias', icono: '✦', roles: [R.A, R.J], grupo: 'General' }, // @RF-05
   { ruta: '/usuarios', titulo: 'Usuarios', icono: '☺', roles: [R.A], grupo: 'Gestión' }, // @RF-01
   { ruta: '/unidades', titulo: 'Unidades y torres', icono: '⌂', roles: [R.A], grupo: 'Gestión' }, // @RF-09
+  { ruta: '/acceso', titulo: 'Control de acceso', icono: '⛨', roles: [R.A, R.P], grupo: 'Portería' }, // @RF-06
+  { ruta: '/visitas', titulo: 'Visitas del día', icono: '☷', roles: [R.A, R.P], grupo: 'Portería' }, // @RF-06
   { ruta: '/auditoria', titulo: 'Auditoría', icono: '⚑', roles: [R.A], grupo: 'Sistema' }, // @RF-09
   { ruta: '/conjunto', titulo: 'Conjunto', icono: '⚙', roles: [R.A], grupo: 'Sistema' }, // @RF-09
 ];
