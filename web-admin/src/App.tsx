@@ -14,6 +14,7 @@ import { MENU, rutaInicial } from './rutas';
 import { Login } from './pages/Login';
 import { Tablero } from './pages/Tablero'; // @RF-09
 import { Finanzas } from './pages/Finanzas'; // @RF-02
+import { Reportes } from './pages/Reportes'; // @RF-08
 import { Reservas } from './pages/Reservas'; // @RF-03
 import { PqrsPagina } from './pages/Pqrs'; // @RF-04
 import { Noticias } from './pages/Noticias'; // @RF-05
@@ -31,6 +32,7 @@ const ControlAcceso = lazy(() => import('./pages/ControlAcceso').then((m) => ({ 
 const PAGINAS: Record<string, ReactNode> = {
   '/tablero': <Tablero />, // @RF-09
   '/finanzas': <Finanzas />, // @RF-02
+  '/reportes': <Reportes />, // @RF-08
   '/reservas': <Reservas />, // @RF-03
   '/pqrs': <PqrsPagina />, // @RF-04
   '/noticias': <Noticias />, // @RF-05
