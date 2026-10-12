@@ -29,6 +29,9 @@ import { PqrsListaPantalla } from '../pantallas/pqrs/PqrsListaPantalla'; // @RF-
 import { MisReservasPantalla } from '../pantallas/reservas/MisReservasPantalla'; // @RF-03
 import { ReservarPantalla } from '../pantallas/reservas/ReservarPantalla'; // @RF-03
 import { ZonasPantalla } from '../pantallas/reservas/ZonasPantalla'; // @RF-03
+import { DetalleVisitaPantalla } from '../pantallas/visitas/DetalleVisitaPantalla'; // @RF-06
+import { NuevaVisitaPantalla } from '../pantallas/visitas/NuevaVisitaPantalla'; // @RF-06
+import { VisitasPantalla } from '../pantallas/visitas/VisitasPantalla'; // @RF-06
 import { colores } from '../tema';
 import { RutasApp, RutasAuth, RutasPestanas, useNavegacion } from './tipos';
 
@@ -86,6 +89,7 @@ function PestanasPrincipales() {
       <Pestanas.Screen name="Pagos" component={PagosPantalla} options={{ title: 'Estado de cuenta', tabBarLabel: 'Pagos' }} /> {/* @RF-02 */}
       <Pestanas.Screen name="Reservas" component={ZonasPantalla} options={{ title: 'Zonas comunes', tabBarLabel: 'Reservas' }} /> {/* @RF-03 */}
       <Pestanas.Screen name="Pqrs" component={PqrsListaPantalla} options={{ title: 'Mis PQRS', tabBarLabel: 'PQRS' }} /> {/* @RF-04 */}
+      <Pestanas.Screen name="Visitas" component={VisitasPantalla} options={{ title: 'Mis visitas', tabBarLabel: 'Visitas' }} /> {/* @RF-06 */}
       {/* #region @RF-05 */}
       <Pestanas.Screen
         name="Avisos"
@@ -112,6 +116,8 @@ function PilaPrincipal() {
       <PilaApp.Screen name="MisReservas" component={MisReservasPantalla} options={{ title: 'Mis reservas' }} /> {/* @RF-03 */}
       <PilaApp.Screen name="NuevaPqrs" component={NuevaPqrsPantalla} options={{ title: 'Nueva PQRS' }} /> {/* @RF-04 */}
       <PilaApp.Screen name="DetallePqrs" component={DetallePqrsPantalla} options={{ title: 'Detalle de la PQRS' }} /> {/* @RF-04 */}
+      <PilaApp.Screen name="NuevaVisita" component={NuevaVisitaPantalla} options={{ title: 'Pre-registrar visitante' }} /> {/* @RF-06 */}
+      <PilaApp.Screen name="DetalleVisita" component={DetalleVisitaPantalla} options={{ title: 'Código de acceso' }} /> {/* @RF-06 */}
       <PilaApp.Screen name="Noticias" component={NoticiasPantalla} options={{ title: 'Noticias' }} /> {/* @RF-05 */}
       <PilaApp.Screen name="DetalleNoticia" component={DetalleNoticiaPantalla} options={{ title: 'Noticia' }} /> {/* @RF-05 */}
       <PilaApp.Screen name="Perfil" component={PerfilPantalla} options={{ title: 'Mi perfil' }} />
