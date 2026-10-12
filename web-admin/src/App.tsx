@@ -3,11 +3,13 @@
  * La etiqueta @RF-XX indica el requerimiento funcional que introdujo cada página.
  */
 import type { ReactNode } from 'react';
+import { lazy, Suspense } from 'react'; // @RF-06
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import type { Rol } from './api/client';
 import { useAuth } from './auth/AuthContext';
 import { Layout } from './components/Layout';
 import { ProveedorConfirmacion } from './components/ui';
+import { Cargando } from './components/ui'; // @RF-06
 import { MENU, rutaInicial } from './rutas';
 import { Login } from './pages/Login';
 import { Tablero } from './pages/Tablero'; // @RF-09
@@ -17,9 +19,13 @@ import { PqrsPagina } from './pages/Pqrs'; // @RF-04
 import { Noticias } from './pages/Noticias'; // @RF-05
 import { Usuarios } from './pages/Usuarios'; // @RF-01
 import { Unidades } from './pages/Unidades'; // @RF-09
+import { VisitasDia } from './pages/VisitasDia'; // @RF-06
 import { Auditoria } from './pages/Auditoria'; // @RF-09
 import { ConjuntoPagina } from './pages/Conjunto'; // @RF-09
 
+// #region @RF-06 El control de acceso incluye la librería de lectura QR: se carga bajo demanda
+const ControlAcceso = lazy(() => import('./pages/ControlAcceso').then((m) => ({ default: m.ControlAcceso })));
+// #endregion @RF-06
 
 const PAGINAS: Record<string, ReactNode> = {
   '/tablero': <Tablero />, // @RF-09
@@ -29,6 +35,14 @@ const PAGINAS: Record<string, ReactNode> = {
   '/noticias': <Noticias />, // @RF-05
   '/usuarios': <Usuarios />, // @RF-01
   '/unidades': <Unidades />, // @RF-09
+  // #region @RF-06
+  '/acceso': (
+    <Suspense fallback={<Cargando />}>
+      <ControlAcceso />
+    </Suspense>
+  ),
+  '/visitas': <VisitasDia />,
+  // #endregion @RF-06
   '/auditoria': <Auditoria />, // @RF-09
   '/conjunto': <ConjuntoPagina />, // @RF-09
 };
