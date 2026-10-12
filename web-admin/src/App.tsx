@@ -13,6 +13,7 @@ import { Login } from './pages/Login';
 import { Tablero } from './pages/Tablero'; // @RF-09
 import { Finanzas } from './pages/Finanzas'; // @RF-02
 import { Reservas } from './pages/Reservas'; // @RF-03
+import { PqrsPagina } from './pages/Pqrs'; // @RF-04
 import { Usuarios } from './pages/Usuarios'; // @RF-01
 import { Unidades } from './pages/Unidades'; // @RF-09
 import { Auditoria } from './pages/Auditoria'; // @RF-09
@@ -23,6 +24,7 @@ const PAGINAS: Record<string, ReactNode> = {
   '/tablero': <Tablero />, // @RF-09
   '/finanzas': <Finanzas />, // @RF-02
   '/reservas': <Reservas />, // @RF-03
+  '/pqrs': <PqrsPagina />, // @RF-04
   '/usuarios': <Usuarios />, // @RF-01
   '/unidades': <Unidades />, // @RF-09
   '/auditoria': <Auditoria />, // @RF-09
