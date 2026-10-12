@@ -10,11 +10,19 @@ import { Layout } from './components/Layout';
 import { ProveedorConfirmacion } from './components/ui';
 import { MENU, rutaInicial } from './rutas';
 import { Login } from './pages/Login';
+import { Tablero } from './pages/Tablero'; // @RF-09
 import { Usuarios } from './pages/Usuarios'; // @RF-01
+import { Unidades } from './pages/Unidades'; // @RF-09
+import { Auditoria } from './pages/Auditoria'; // @RF-09
+import { ConjuntoPagina } from './pages/Conjunto'; // @RF-09
 
 
 const PAGINAS: Record<string, ReactNode> = {
+  '/tablero': <Tablero />, // @RF-09
   '/usuarios': <Usuarios />, // @RF-01
+  '/unidades': <Unidades />, // @RF-09
+  '/auditoria': <Auditoria />, // @RF-09
+  '/conjunto': <ConjuntoPagina />, // @RF-09
 };
 
 /** Exige sesión iniciada; si no, redirige al login conservando la ruta solicitada. */

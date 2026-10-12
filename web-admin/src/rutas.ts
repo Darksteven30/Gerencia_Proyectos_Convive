@@ -12,7 +12,11 @@ export interface ItemMenu {
 const R = { A: 'ADMINISTRADOR', J: 'JUNTA', P: 'PORTERIA' } satisfies Record<string, Rol>;
 
 export const MENU: ItemMenu[] = [
+  { ruta: '/tablero', titulo: 'Tablero', icono: '▦', roles: [R.A, R.J], grupo: 'General' }, // @RF-09
   { ruta: '/usuarios', titulo: 'Usuarios', icono: '☺', roles: [R.A], grupo: 'Gestión' }, // @RF-01
+  { ruta: '/unidades', titulo: 'Unidades y torres', icono: '⌂', roles: [R.A], grupo: 'Gestión' }, // @RF-09
+  { ruta: '/auditoria', titulo: 'Auditoría', icono: '⚑', roles: [R.A], grupo: 'Sistema' }, // @RF-09
+  { ruta: '/conjunto', titulo: 'Conjunto', icono: '⚙', roles: [R.A], grupo: 'Sistema' }, // @RF-09
 ];
 
 export const menuParaRoles = (roles: Rol[]) => MENU.filter((m) => m.roles.some((r) => roles.includes(r)));
