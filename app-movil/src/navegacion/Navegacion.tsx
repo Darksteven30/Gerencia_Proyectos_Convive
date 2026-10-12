@@ -1,0 +1,146 @@
+/**
+ * Navegación de la app (React Navigation):
+ * - Sin sesión: pila de autenticación (ingreso, activación, recuperación).
+ * - Con sesión: pila principal con las pestañas inferiores y las pantallas de detalle.
+ */
+import React from 'react';
+import { Platform, Pressable } from 'react-native';
+import { DefaultTheme, NavigationContainer, Theme } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
+import { EstadoCarga } from '../componentes/ui';
+import { useAuth } from '../contexto/AuthContext';
+import { useNotificaciones } from '../contexto/NotificacionesContext'; // @RF-05
+import { ActivarPantalla } from '../pantallas/auth/ActivarPantalla';
+import { IngresoPantalla } from '../pantallas/auth/IngresoPantalla';
+import { RecuperarPantalla } from '../pantallas/auth/RecuperarPantalla';
+import { InicioPantalla } from '../pantallas/InicioPantalla';
+import { NotificacionesPantalla } from '../pantallas/NotificacionesPantalla'; // @RF-05
+import { DetalleNoticiaPantalla } from '../pantallas/noticias/DetalleNoticiaPantalla'; // @RF-05
+import { NoticiasPantalla } from '../pantallas/noticias/NoticiasPantalla'; // @RF-05
+import { HistorialPagosPantalla } from '../pantallas/pagos/HistorialPagosPantalla'; // @RF-02
+import { PagosPantalla } from '../pantallas/pagos/PagosPantalla'; // @RF-02
+import { ResultadoPagoPantalla } from '../pantallas/pagos/ResultadoPagoPantalla'; // @RF-02
+import { PerfilPantalla } from '../pantallas/PerfilPantalla';
+import { DetallePqrsPantalla } from '../pantallas/pqrs/DetallePqrsPantalla'; // @RF-04
+import { NuevaPqrsPantalla } from '../pantallas/pqrs/NuevaPqrsPantalla'; // @RF-04
+import { PqrsListaPantalla } from '../pantallas/pqrs/PqrsListaPantalla'; // @RF-04
+import { MisReservasPantalla } from '../pantallas/reservas/MisReservasPantalla'; // @RF-03
+import { ReservarPantalla } from '../pantallas/reservas/ReservarPantalla'; // @RF-03
+import { ZonasPantalla } from '../pantallas/reservas/ZonasPantalla'; // @RF-03
+import { DetalleVisitaPantalla } from '../pantallas/visitas/DetalleVisitaPantalla'; // @RF-06
+import { NuevaVisitaPantalla } from '../pantallas/visitas/NuevaVisitaPantalla'; // @RF-06
+import { VisitasPantalla } from '../pantallas/visitas/VisitasPantalla'; // @RF-06
+import { colores } from '../tema';
+import { RutasApp, RutasAuth, RutasPestanas, useNavegacion } from './tipos';
+
+const PilaAuth = createNativeStackNavigator<RutasAuth>();
+const PilaApp = createNativeStackNavigator<RutasApp>();
+const Pestanas = createBottomTabNavigator<RutasPestanas>();
+
+const tema: Theme = {
+  ...DefaultTheme,
+  colors: { ...DefaultTheme.colors, primary: colores.primario, background: colores.fondo, card: colores.blanco, text: colores.texto },
+};
+
+const opcionesEncabezado = {
+  headerTitleStyle: { fontWeight: '700' as const, color: colores.texto },
+  headerTintColor: colores.primario,
+  headerShadowVisible: false,
+  headerBackTitle: 'Atrás',
+};
+
+type NombreIcono = React.ComponentProps<typeof Ionicons>['name'];
+const ICONOS: Record<keyof RutasPestanas, [NombreIcono, NombreIcono]> = {
+  Inicio: ['home', 'home-outline'],
+  Pagos: ['card', 'card-outline'],
+  Reservas: ['calendar', 'calendar-outline'],
+  Pqrs: ['chatbubbles', 'chatbubbles-outline'],
+  Visitas: ['people', 'people-outline'],
+  Avisos: ['notifications', 'notifications-outline'],
+};
+
+function BotonPerfil() {
+  const navegacion = useNavegacion();
+  return (
+    <Pressable onPress={() => navegacion.navigate('Perfil')} hitSlop={10} style={{ marginHorizontal: 16 }} accessibilityLabel="Mi perfil">
+      <Ionicons name="person-circle-outline" size={28} color={colores.primario} />
+    </Pressable>
+  );
+}
+
+function PestanasPrincipales() {
+  const { noLeidas } = useNotificaciones(); // @RF-05
+  return (
+    <Pestanas.Navigator
+      screenOptions={({ route }) => ({
+        ...opcionesEncabezado,
+        headerRight: () => <BotonPerfil />,
+        tabBarActiveTintColor: colores.primario,
+        tabBarInactiveTintColor: colores.textoSecundario,
+        tabBarLabelStyle: { fontSize: 11, lineHeight: 15, fontWeight: '600' },
+        // En el navegador no hay área segura inferior: se da más alto a la barra para que no se corten las etiquetas
+        tabBarStyle: Platform.OS === 'web' ? { height: 66, paddingTop: 4, paddingBottom: 6 } : undefined,
+        tabBarIcon: ({ focused, color, size }) => <Ionicons name={ICONOS[route.name][focused ? 0 : 1]} size={size} color={color} />,
+      })}
+    >
+      <Pestanas.Screen name="Inicio" component={InicioPantalla} options={{ title: 'Convive', tabBarLabel: 'Inicio' }} />
+      <Pestanas.Screen name="Pagos" component={PagosPantalla} options={{ title: 'Estado de cuenta', tabBarLabel: 'Pagos' }} /> {/* @RF-02 */}
+      <Pestanas.Screen name="Reservas" component={ZonasPantalla} options={{ title: 'Zonas comunes', tabBarLabel: 'Reservas' }} /> {/* @RF-03 */}
+      <Pestanas.Screen name="Pqrs" component={PqrsListaPantalla} options={{ title: 'Mis PQRS', tabBarLabel: 'PQRS' }} /> {/* @RF-04 */}
+      <Pestanas.Screen name="Visitas" component={VisitasPantalla} options={{ title: 'Mis visitas', tabBarLabel: 'Visitas' }} /> {/* @RF-06 */}
+      {/* #region @RF-05 */}
+      <Pestanas.Screen
+        name="Avisos"
+        component={NotificacionesPantalla}
+        options={{
+          title: 'Notificaciones',
+          tabBarLabel: 'Avisos',
+          tabBarBadge: noLeidas > 0 ? (noLeidas > 99 ? '99+' : noLeidas) : undefined,
+          tabBarBadgeStyle: { backgroundColor: colores.peligro },
+        }}
+      />
+      {/* #endregion @RF-05 */}
+    </Pestanas.Navigator>
+  );
+}
+
+function PilaPrincipal() {
+  return (
+    <PilaApp.Navigator screenOptions={opcionesEncabezado}>
+      <PilaApp.Screen name="Pestanas" component={PestanasPrincipales} options={{ headerShown: false, title: 'Convive' }} />
+      <PilaApp.Screen name="ResultadoPago" component={ResultadoPagoPantalla} options={{ title: 'Resultado del pago' }} /> {/* @RF-02 */}
+      <PilaApp.Screen name="HistorialPagos" component={HistorialPagosPantalla} options={{ title: 'Historial de pagos' }} /> {/* @RF-02 */}
+      <PilaApp.Screen name="Reservar" component={ReservarPantalla} options={({ route }) => ({ title: route.params.zona.nombre })} /> {/* @RF-03 */}
+      <PilaApp.Screen name="MisReservas" component={MisReservasPantalla} options={{ title: 'Mis reservas' }} /> {/* @RF-03 */}
+      <PilaApp.Screen name="NuevaPqrs" component={NuevaPqrsPantalla} options={{ title: 'Nueva PQRS' }} /> {/* @RF-04 */}
+      <PilaApp.Screen name="DetallePqrs" component={DetallePqrsPantalla} options={{ title: 'Detalle de la PQRS' }} /> {/* @RF-04 */}
+      <PilaApp.Screen name="NuevaVisita" component={NuevaVisitaPantalla} options={{ title: 'Pre-registrar visitante' }} /> {/* @RF-06 */}
+      <PilaApp.Screen name="DetalleVisita" component={DetalleVisitaPantalla} options={{ title: 'Código de acceso' }} /> {/* @RF-06 */}
+      <PilaApp.Screen name="Noticias" component={NoticiasPantalla} options={{ title: 'Noticias' }} /> {/* @RF-05 */}
+      <PilaApp.Screen name="DetalleNoticia" component={DetalleNoticiaPantalla} options={{ title: 'Noticia' }} /> {/* @RF-05 */}
+      <PilaApp.Screen name="Perfil" component={PerfilPantalla} options={{ title: 'Mi perfil' }} />
+    </PilaApp.Navigator>
+  );
+}
+
+function PilaAutenticacion() {
+  return (
+    <PilaAuth.Navigator screenOptions={opcionesEncabezado}>
+      <PilaAuth.Screen name="Ingreso" component={IngresoPantalla} options={{ headerShown: false, title: 'Ingresar' }} />
+      <PilaAuth.Screen name="Activar" component={ActivarPantalla} options={{ title: 'Activar cuenta' }} />
+      <PilaAuth.Screen name="Recuperar" component={RecuperarPantalla} options={{ title: 'Recuperar contraseña' }} />
+    </PilaAuth.Navigator>
+  );
+}
+
+export function Navegacion() {
+  const { perfil, iniciando } = useAuth();
+  if (iniciando) return <EstadoCarga texto="Iniciando Convive…" />;
+  return (
+    <NavigationContainer theme={tema} documentTitle={{ formatter: (opciones) => `${opciones?.title ?? 'Convive'} · Convive` }}>
+      {perfil ? <PilaPrincipal /> : <PilaAutenticacion />}
+    </NavigationContainer>
+  );
+}
